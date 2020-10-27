@@ -1,5 +1,6 @@
 from tkinter import * #For designing of front end
 from PIL import ImageTk, Image #For loading images
+from tkinter import font as tkFont
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -9,11 +10,40 @@ class AttendanceManager(object):
         self.root.geometry("1200x800")
         self.root.title("Attendance Manager")
         self.root.resizable(0,0)  #to disable resizing of root window to avoid distortion
-        self.BackgroundImage(self.root,"First")
-        self.creat_MainFrame("First")
+        self.BackgroundImage(self.root)
+        self.create_MainFrame("First")
+        self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
+        self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
+        self.FirstPage()
         self.root.mainloop()
 
-    def creat_MainFrame(self,page="Any"):
+    def FirstPage(self):
+        self.content_frame = Frame(self.main_frame,height=300,width=700,bg="Black")
+        self.content_frame.place(x=500,y=450)  #Place below heading
+        self.ProceedButton = Button(self.content_frame,text="Proceed",activebackground="grey",bd=3,bg="White",fg="Black",
+                                    command=self.ProceedPage,font=self.ButtonFont,justify=CENTER,height=2,width=10)
+        self.ProceedButton.place(x=0,y=25)
+        self.AboutButton = Button(self.content_frame, text="About", activebackground="grey", bd=3, bg="White",fg="Black",
+                                    command=self.AboutPage, font=self.ButtonFont, justify=CENTER, height=2, width=10)
+        self.AboutButton.place(x=300, y=25)
+
+    def ProceedPage(self):
+        self.main_frame.destroy()  #Destroy the entire main frame and create a new page
+        self.create_MainFrame()
+
+    def AboutPage(self):
+        self.content_frame.destroy() #Just destroy the content frame as the heading is needed
+        self.content_frame = Frame(self.main_frame, height=300, width=700, bg="Black")
+        self.content_frame.place(x=500, y=450)  # Place below heading
+        self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun Bajaj and Anirudh Singh"
+        self.AboutInfo = Message(self.content_frame,bg="Black",fg="White",font=self.TextFont,justify=CENTER,width=600,
+                                 text=self.about)
+        self.AboutInfo.place(x=0,y=0)
+        self.BackButton = Button(self.content_frame, text="Back", activebackground="grey", bd=3, bg="White",fg="Black",
+                                    command=self.FirstPage, font=self.ButtonFont, justify=CENTER, height=1, width=5)
+        self.BackButton.place(x=400,y=250)
+
+    def create_MainFrame(self,page="Any"):
         self.main_frame = Frame(self.root, height=800, width=1200)
         self.main_frame.place(x=0, y=0)
         self.BackgroundImage(self.main_frame,page)
