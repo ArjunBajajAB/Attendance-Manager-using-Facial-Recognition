@@ -82,9 +82,9 @@ class AttendanceManager(object):
                                      command=self.ContinuePage)
         self.ContinueButton.place(x=850, y=470)
 
-        self.BackButton_Process = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",
+        self.BackButton = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",command=self.FirstPage,
                                          fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7)
-        self.BackButton_Process.place(x=900, y=680)
+        self.BackButton.place(x=750, y=550)
 
     ##############################################################################################################
     ####################################### Continue  Page ########################################################
