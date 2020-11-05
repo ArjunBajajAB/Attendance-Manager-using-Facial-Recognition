@@ -11,25 +11,130 @@ class AttendanceManager(object):
         self.root.title("Attendance Manager")
         self.root.resizable(0,0)  #to disable resizing of root window to avoid distortion
         self.BackgroundImage(self.root)
-        self.create_MainFrame("First")
         self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
         self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
         self.FirstPage()
         self.root.mainloop()
 
+    #################################################################################################################
+    ############################################### 1st Page ########################################################
+    #################################################################################################################
+
     def FirstPage(self):
+        self.create_MainFrame("First")
         self.content_frame = Frame(self.main_frame,height=300,width=700,bg="Black")
-        self.content_frame.place(x=500,y=450)  #Place below heading
+        self.content_frame.place(x=500,y=550)  #Place below heading
         self.ProceedButton = Button(self.content_frame,text="Proceed",activebackground="grey",bd=3,bg="White",fg="Black",
-                                    command=self.ProceedPage,font=self.ButtonFont,justify=CENTER,height=2,width=10)
+                                    command=self.ProceedPage,font=self.ButtonFont,justify=CENTER,height=1,width=7)
         self.ProceedButton.place(x=0,y=25)
         self.AboutButton = Button(self.content_frame, text="About", activebackground="grey", bd=3, bg="White",fg="Black",
-                                    command=self.AboutPage, font=self.ButtonFont, justify=CENTER, height=2, width=10)
-        self.AboutButton.place(x=300, y=25)
+                                    command=self.AboutPage, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+        self.AboutButton.place(x=200, y=25)
+        self.ExitButton = Button(self.content_frame, text="Exit", activebackground="grey", bd=3, bg="White",fg="Black",
+                                 command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+        self.ExitButton.place(x=400, y=25)
+
+    ######################################################################################################################
+    ################################################ Proceed Page ########################################################
+    ######################################################################################################################
 
     def ProceedPage(self):
         self.main_frame.destroy()  #Destroy the entire main frame and create a new page
         self.create_MainFrame()
+        self.NameLabel = Label(self.main_frame, text="Name     :",bg="black", fg="white", font=self.TextFont)
+        self.NameLabel.place(x=600, y=170)
+
+        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="black", fg="white")
+        self.EnterName.place(x=790, y=170)
+
+        self.EnrollmentNoLabel = Label(self.main_frame, text="Enrollment No :", bg="black", fg="white",
+                                       font=self.TextFont)
+        self.EnrollmentNoLabel.place(x=600, y=240)
+
+        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="black", fg="white")
+        self.EnterEnrollmentNo.place(x=790, y=240)
+
+        self.CourseLabel = Label(self.main_frame, text="Course     :", bg="black", fg="white", font=self.TextFont)
+        self.CourseLabel.place(x=600, y=300)
+
+        self.clicked = StringVar(self.main_frame)
+        self.clicked.set("Select")
+        self.CourseEnter = OptionMenu(self.main_frame, self.clicked, "BCA", "B.Tech")
+        self.CourseEnter.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
+        self.CourseEnter.place(x=790, y=300)
+
+        self.SemesterLabel = Label(self.main_frame, text="Semester   :", bg="black", fg="white", font=self.TextFont)
+        self.SemesterLabel.place(x=600, y=360)
+
+        self.SelectSemester = StringVar(self.main_frame)
+        self.SelectSemester.set("Select")
+        self.EnterSemester = OptionMenu(self.main_frame,self.clicked , "I", "II", "III", "IV", "V", "VI", "VII", "VIII")
+        self.EnterSemester.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
+        self.EnterSemester.place(x=790, y=360)
+
+        self.ResetButton = Button(self.main_frame, text="Reset", activebackground="grey", bd=3, bg="White",
+                                  fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7,
+                                  command=self.ProceedPage)
+        self.ResetButton.place(x=650, y=470)
+
+        self.ContinueButton = Button(self.main_frame, text="Continue", activebackground="grey", bd=3, bg="White",
+                                     fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7,
+                                     command=self.ContinuePage)
+        self.ContinueButton.place(x=850, y=470)
+
+        self.BackButton_Process = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",
+                                         fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7)
+        self.BackButton_Process.place(x=900, y=680)
+
+    ##############################################################################################################
+    ####################################### Continue  Page ########################################################
+    ###############################################################################################################
+
+    def ContinuePage(self):
+        self.Name = self.EnterName.get()
+        self.RollNo = self.EnterEnrollmentNo.get()
+        self.Course = self.clicked.get()
+        self.Semester = self.SelectSemester.get()
+        self.Name = self.Name.replace(" ", "")
+        if self.RollNo.isdigit() and int(len(self.RollNo)) == 11 and self.Name.isalpha() and self.Semester != "Select" and self.Course != "Select":
+            if self.Course == "BCA" and self.Semester == "VII":
+                self.Alert_1 = Label(self.main_frame, text="!There are only I TO VI \n Semester in BCA ",
+                                     bg="black", fg="white", font=self.TextFont)
+                self.Alert_1.place(x=860, y=360)
+            elif self.Course == "BCA" and self.Semester == "VIII":
+                self.Alert_1 = Label(self.main_frame, text="!There are only I TO VI \n Semester in BCA ",
+                                     bg="black", fg="white", font=self.TextFont)
+                self.Alert_1.place(x=860, y=360)
+            else:
+                self.main_frame.destroy()
+                self.create_MainFrame()
+                self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
+                                                          activebackground="grey", bd=3, bg="White",
+                                                          fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                                          width=25, command=self.Check_AttendancePage)
+                self.Check_Your_AttendanceButton.place(x=650, y=210)
+
+                self.Mark_Your_AttendanceButton = Button(self.main_frame, text="Mark your attendance",
+                                                         activebackground="grey", bd=3, bg="White",
+                                                         fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                                         width=25, command=self.Mark_AttendancePage)
+                self.Mark_Your_AttendanceButton.place(x=650, y=310)
+
+                self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3,
+                                               bg="White",
+                                               fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
+                                               command=self.ProceedPage)
+                self.BackButton_Check.place(x=1100, y=680)
+        else:
+            self.ProceedPage()
+            self.Alert = Label(self.main_frame,
+                               text="!Your name should be name \n\n Enrollment number should be 11 digits only:",
+                               bg="black", fg="white", font=self.TextFont)
+            self.Alert.place(x=590, y=70)
+
+    ###################################################################################################################
+    ############################################## About Page #########################################################
+    ###################################################################################################################
 
     def AboutPage(self):
         self.content_frame.destroy() #Just destroy the content frame as the heading is needed
