@@ -120,7 +120,7 @@ class AttendanceManager(object):
                                                bg="White",
                                                fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
                                                command=self.ProceedPage)
-                self.BackButton_Check.place(x=1100, y=680)
+                self.BackButton_Check.place(x=650, y=410)
         else:
             self.ProceedPage()
             self.Alert = Label(self.main_frame,

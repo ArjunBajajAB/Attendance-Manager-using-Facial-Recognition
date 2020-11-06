@@ -303,9 +303,9 @@ class AttendanceManager(object):
 
     def BackgroundImage(self,frame,page="Any"):
         if page == "First":
-            self.bg_image = ImageTk.PhotoImage(file="Background_Front.jpg")
+            self.bg_image = ImageTk.PhotoImage(file="Images/Background_Front.jpg")
         else:
-            self.bg_image = ImageTk.PhotoImage(file="Background.jpg")
+            self.bg_image = ImageTk.PhotoImage(file="Images/Background.jpg")
         self.bg_label = Label(frame, image=self.bg_image)
         self.bg_label.place(x=0, y=0)
 
