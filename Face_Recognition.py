@@ -1,6 +1,7 @@
 from tkinter import *  #For designing of front end
 from PIL import ImageTk, Image  #For loading images
 from tkinter import font as tkFont
+import cv2
   #Add more libraries here
 
 class AttendanceManager(object):
@@ -104,8 +105,8 @@ class AttendanceManager(object):
         self.BackButton_Process.place(x=1100, y=680)
 
 ##############################################################################################################
-####################################### 4th Page ######################################################################
-###############################################################################################################
+######################################### 4th Page ###########################################################
+##############################################################################################################
 
     def ContinuePage(self):
         self.Name = self.EnterName.get()
@@ -113,7 +114,7 @@ class AttendanceManager(object):
         self.Course = self.clicked.get()
         self.Semester = self.SelectSemester.get()
         self.Name = self.Name.replace(" ", "")
-        if self.RollNo.isdigit() and int(len(self.RollNo)) == 11 and self.Name.isalpha() and self.Semester != "Select" and self.Course != "Select":
+        if self.RollNo.isdigit() and int(len(self.RollNo)) == 1 and self.Name.isalpha() and self.Semester != "Select" and self.Course != "Select":
             if self.Course == "BCA" and self.Semester == "VII":
                 self.Alert_1 = Label(self.main_frame,text="!There are only I TO VI \n Semester in BCA ",
                                    bg="black", fg="white", font=self.TextFont)
@@ -200,7 +201,7 @@ class AttendanceManager(object):
         self.BackButton_Check.place(x=1100, y=680)
 
 ##############################################################################################################
-########################################## 6th Page ############################################################
+########################################## 6th Page ##########################################################
 ##############################################################################################################
 
     def ShowAttendance(self):
@@ -213,12 +214,87 @@ class AttendanceManager(object):
             self.ShowSubjectAttendance = Label(self.main_frame, text="Your attendance of " + self.subject + " is ", bg="black", fg="white", font=self.TextFont)
             self.ShowSubjectAttendance.place(x=600, y=350)
 
+###############################################################################################################
 ############################################ 7th Page #########################################################
+###############################################################################################################
 
     def Mark_AttendancePage(self):
         self.main_frame.destroy()
         self.create_MainFrame()
 
+
+        self.SelectSubject = Label(self.main_frame, text="Select subject :", bg="black", fg="white", font=self.TextFont)
+        self.SelectSubject.place(x=600, y=200)
+
+        self.course = self.clicked.get()
+        self.semester = self.SelectSemester.get()
+        self.ClickedSubject = StringVar(self.main_frame)
+        self.ClickedSubject.set("Select")
+        if self.course == "BCA":
+            if self.semester == "I":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-I",
+                                               "Techical Communication", "C language", "ICIT", "Physic")
+            elif self.semester == "II":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
+                                               "DBMS")
+            elif self.semester == "III":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT", "POA",
+                                               "C++")
+            elif self.semester == "IV":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
+                                               "SE", "CN")
+            elif self.semester == "V":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS", "ST",
+                                               "BE")
+            elif self.semester == "VI":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux", "M&IA",
+                                               "BI", "AI", "NS", "NP")
+        elif self.course == "B.Tech":
+            if self.semester == "I":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-I",
+                                               "Techical Communication", "C language", "ICIT", "Physic-I")
+            elif self.semester == "II":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
+                                               "DBMS")
+            elif self.semester == "III":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT", "POA",
+                                               "C++")
+            elif self.semester == "IV":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
+                                               "SE", "CN")
+            elif self.semester == "V":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS", "ST",
+                                               "BE")
+            elif self.semester == "VI":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+            elif self.semester == "VII":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+            elif self.semester == "VIII":
+                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+        self.SubjectEnter.config(bg="Black", fg="White")
+        self.SubjectEnter.place(x=820, y=200)
+
+        self.MarkSubjectAttendance = Button(self.main_frame, text="Mark your attendance", activebackground="grey", bd=3, bg="White",
+                                       fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=19,command=self.openCamera)
+        self.MarkSubjectAttendance.place(x=715, y=250)
+
+    def openCamera(self):
+        self.main_frame.destroy()
+        self.create_MainFrame()
+
+
+        self.Video = cv2.VideoCapture(0)
+        while True:
+
+            self.frame ,self.ret = self.Video.read()
+
+            cv2.imshow("Capturing",self.frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        self.Video.release()
+        cv2.destroyAllWindows()
 
     def create_MainFrame(self,page="Any"):
         self.main_frame = Frame(self.root, height=800, width=1200)
@@ -227,9 +303,9 @@ class AttendanceManager(object):
 
     def BackgroundImage(self,frame,page="Any"):
         if page == "First":
-            self.bg_image = ImageTk.PhotoImage(file="Images/Background_Front.jpg")
+            self.bg_image = ImageTk.PhotoImage(file="Background_Front.jpg")
         else:
-            self.bg_image = ImageTk.PhotoImage(file="Images/Background.jpg")
+            self.bg_image = ImageTk.PhotoImage(file="Background.jpg")
         self.bg_label = Label(frame, image=self.bg_image)
         self.bg_label.place(x=0, y=0)
 
