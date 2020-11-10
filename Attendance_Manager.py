@@ -1,6 +1,8 @@
 from tkinter import * #For designing of front end
 from PIL import ImageTk, Image #For loading images
 from tkinter import font as tkFont
+import cv2
+import PIL
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -148,7 +150,24 @@ class AttendanceManager(object):
     def MarkAttendancePage(self):
         self.main_frame.destroy()
         self.create_MainFrame()
+        self.CameraFrame = Frame(self.main_frame,height=700,width=1150)
+        self.CameraFrame.place(x=10,y=10)
+        self.CameraLabel = Label(self.CameraFrame,height=700,width=1150)
+        self.CameraLabel.place(x=0,y=0)
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,700)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,1150)
+        self.ShowFrame()
 
+    def ShowFrame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            self.frame = cv2.flip(frame, 1)
+            self.img = PIL.Image.fromarray(self.frame)
+            self.imgtk = ImageTk.PhotoImage(image=self.img)
+            self.CameraLabel.img = self.imgtk
+            self.CameraLabel.configure(image=self.imgtk)
+            self.CameraLabel.after(10, self.ShowFrame)
     ##############################################################################################################
     ############################################# Attendance Page ################################################
     ##############################################################################################################
