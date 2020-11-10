@@ -98,6 +98,8 @@ class AttendanceManager(object):
     def Reset(self):
         self.EnterName.delete(0, END)
         self.EnterEnrollmentNo.delete(0, END)
+        self.SelectSemester.set("Select")
+        self.clicked.set("Select")
 
     ##############################################################################################################
     ####################################### Continue  Page ########################################################
