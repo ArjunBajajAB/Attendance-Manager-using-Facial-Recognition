@@ -163,6 +163,7 @@ class AttendanceManager(object):
         ret, frame = self.cap.read()
         if ret:
             self.frame = cv2.flip(frame, 1)
+            self.frame = cv2.cvtColor(self.frame,cv2.COLOR_BGR2RGBA)
             self.img = PIL.Image.fromarray(self.frame)
             self.imgtk = ImageTk.PhotoImage(image=self.img)
             self.CameraLabel.img = self.imgtk
