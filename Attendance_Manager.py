@@ -3,6 +3,8 @@ from PIL import ImageTk, Image #For loading images
 from tkinter import font as tkFont
 import cv2
 import PIL
+import pyscreenshot as ImageGrab
+import Database as db
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -15,6 +17,7 @@ class AttendanceManager(object):
         self.BackgroundImage(self.root)
         self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
         self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
+        self.InfoFont = tkFont.Font(family="Courier New", size=25, weight="bold")
         self.FirstPage()
         self.root.mainloop()
 
@@ -151,13 +154,21 @@ class AttendanceManager(object):
         self.main_frame.destroy()
         self.create_MainFrame()
         self.CameraFrame = Frame(self.main_frame,height=700,width=1150)
-        self.CameraFrame.place(x=10,y=10)
+        self.CameraFrame.place(x=25,y=10)
         self.CameraLabel = Label(self.CameraFrame,height=700,width=1150)
         self.CameraLabel.place(x=0,y=0)
         self.cap = cv2.VideoCapture(0)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,700)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,1150)
         self.ShowFrame()
+        self.ContentFrame = Frame(self.main_frame,height=70,width=1050,bg="black")
+        self.ContentFrame.place(x=100,y=720)
+        self.Info = Message(self.ContentFrame,text="Please try to adjust you entire face in the video frame and then press the Click Button",
+                            font=self.TextFont,fg="white",width=750,justify=LEFT,bg="black")
+        self.Info.place(x=0,y=0)
+        self.ClickButton = Button(self.ContentFrame,text="Click",fg="black",bg="white",bd=3,activebackground="grey",font=self.ButtonFont,
+                                  height=1,width=8,command=self.ClickImage,justify=CENTER)
+        self.ClickButton.place(x=850,y=0)
 
     def ShowFrame(self):
         ret, frame = self.cap.read()
@@ -169,6 +180,19 @@ class AttendanceManager(object):
             self.CameraLabel.img = self.imgtk
             self.CameraLabel.configure(image=self.imgtk)
             self.CameraLabel.after(10, self.ShowFrame)
+
+    def ClickImage(self):
+        x1 = self.root.winfo_rootx() + 25 + self.CameraFrame.winfo_x()
+        y1 = self.root.winfo_rooty() + 10 + self.CameraFrame.winfo_y()
+        x2 = x1 + 1150
+        y2 = y1 + 700
+        self.img = ImageGrab.grab((x1,y1,x2,y2))
+        imgpath = "Images/Person.png"
+        self.img.save(imgpath)
+        self.main_frame.destroy()
+        self.create_MainFrame()
+
+
     ##############################################################################################################
     ############################################# Attendance Page ################################################
     ##############################################################################################################
