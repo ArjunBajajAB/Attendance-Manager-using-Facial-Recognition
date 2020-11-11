@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import csv
+import HelperFunctions
 
-DataBase = pd.read_csv("DataBase.csv")
+DataBase = pd.read_csv("Database/DataBase.csv")
 
 SubjectsID = {
     1:["Maths_1","TC","ICIT","Physics","C"],
@@ -18,3 +19,7 @@ SubjectsID = {
     64:["DWH & DM","MC","Linux","AI"],
     65:["DWH & DM","MC","Linux","Multimedia"]
 }
+
+ImageData = {}
+ImageData[int(DataBase["DictId"][DataBase["Name"].str.contains("Hrithik")])] = HelperFunctions.img_to_encoding("Images/hrithik.jpeg",FRmodel)
+ImageData[int(DataBase["DictId"][DataBase["Name"].str.contains("Arjun")])] = HelperFunctions.img_to_encoding("Images/arjun.jpg",FRmodel)
