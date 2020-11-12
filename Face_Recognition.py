@@ -3,6 +3,7 @@ from PIL import ImageTk, Image  # For loading images
 from tkinter import font as tkFont
 import calendar
 import datetime
+import cv2
 
 
 # Add more libraries here
@@ -98,8 +99,8 @@ class AttendanceManager(object):
     def Reset(self):
         self.EnterName.delete(0, END)
         self.EnterEnrollmentNo.delete(0, END)
-        self.SelectSemester.set("Select")
         self.clicked.set("Select")
+        self.SelectSemester.set("Select")
 
     ##############################################################################################################
     ####################################### Continue  Page ########################################################
@@ -217,6 +218,62 @@ class AttendanceManager(object):
         self.SubjectEnter.config(bg="Black", fg="White")
         self.SubjectEnter.place(x=820, y=200)
 
+        self.MarkattendanceButton = Button(self.main_frame, text="Mark Attendance", activebackground="grey", bd=3,
+                                           bg="White",
+                                           fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=15,
+                                           command=self.opencamera)
+        self.MarkattendanceButton.place(x=752, y=250)
+
+    def opencamera(self):
+        self.Selectmarksubject = self.ClickedSubject.get()
+        if self.Selectmarksubject == "Select":
+            self.SelectSubject = Label(self.main_frame, text="Select Subject!!", bg="black", fg="white",
+                                       font=self.TextFont)
+            self.SelectSubject.place(x=700, y=320)
+        else:
+            self.main_frame.destroy()
+            self.create_MainFrame()
+            self.CameraFrame = Frame(self.main_frame, height=700, width=1150)
+            self.CameraFrame.place(x=25, y=10)
+            self.CameraLabel = Label(self.CameraFrame, height=700, width=1150)
+            self.CameraLabel.place(x=0, y=0)
+            self.cap = cv2.VideoCapture(0)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 700)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1150)
+            self.ShowFrame()
+            self.ContentFrame = Frame(self.main_frame, height=70, width=1050, bg="black")
+            self.ContentFrame.place(x=100, y=720)
+            self.Info = Message(self.ContentFrame,
+                                text="Please try to adjust you entire face in the video frame and then press the Click Button",
+                                font=self.TextFont, fg="white", width=750, justify=LEFT, bg="black")
+            self.Info.place(x=0, y=0)
+            self.ClickButton = Button(self.ContentFrame, text="Click", fg="black", bg="white", bd=3,
+                                      activebackground="grey", font=self.ButtonFont,
+                                      height=1, width=8, command=self.ClickImage, justify=CENTER)
+            self.ClickButton.place(x=850, y=0)
+
+    def ShowFrame(self):
+        ret, frame = self.cap.read()
+        if ret:
+            self.frame = cv2.flip(frame, 1)
+            self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGBA)
+            self.img = PIL.Image.fromarray(self.frame)
+            self.imgtk = ImageTk.PhotoImage(image=self.img)
+            self.CameraLabel.img = self.imgtk
+            self.CameraLabel.configure(image=self.imgtk)
+            self.CameraLabel.after(10, self.ShowFrame)
+
+    def ClickImage(self):
+        x1 = self.root.winfo_rootx() + 25 + self.CameraFrame.winfo_x()
+        y1 = self.root.winfo_rooty() + 10 + self.CameraFrame.winfo_y()
+        x2 = x1 + 1150
+        y2 = y1 + 700
+        self.img = ImageGrab.grab((x1, y1, x2, y2))
+        imgpath = "Images/Person.png"
+        self.img.save(imgpath)
+        self.main_frame.destroy()
+        self.create_MainFrame()
+
     ##############################################################################################################
     ############################################# Attendance Page ################################################
     ##############################################################################################################
@@ -298,8 +355,10 @@ class AttendanceManager(object):
         self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",
                                        fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8)
         self.BackButton_Check.place(x=700, y=680)
+        self.Calender_frame()
 
     def overallattendance(self):
+        self.calender_frame.destroy()
         self.subject = self.ClickedSubject.get()
         if self.subject == "Select":
             self.Overallattendance = Label(self.label_frame,
@@ -315,18 +374,48 @@ class AttendanceManager(object):
             self.Overallattendance.place(x=20, y=0)
 
     def thismonthattendance(self):
-        self.now = datetime.datetime.now()
-        self.Calender_frame()
-        self.cal = calendar.month(self.now.year, self.now.month)
-        self.thismonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
-        self.thismonthcalendar.place(x=0, y=1)
+        self.calender_frame.destroy()
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.thismonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n this month is : ",
+                                          bg="black", fg="white", font=self.TextFont)
+            self.thismonthoverall.place(x=20, y=0)
+        else:
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.thismonthsubjectattendance = Label(self.label_frame,
+                                                    text="Your this month attendance of\n " + self.subject + " is",
+                                                    bg="black", fg="white", font=self.TextFont)
+            self.thismonthsubjectattendance.place(x=20, y=0)
+            self.now = datetime.datetime.now()
+            self.Calender_frame()
+            self.cal = calendar.month(self.now.year, self.now.month)
+            self.thismonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
+            self.thismonthcalendar.place(x=0, y=1)
 
     def lastmonthattendance(self):
-        self.now = datetime.datetime.now()
-        self.Calender_frame()
-        self.cal = calendar.month(self.now.year, self.now.month - 1)
-        self.lastmonthcalender = Message(self.calender_frame, text=self.cal, font=self.CalFont)
-        self.lastmonthcalender.place(x=0, y=1)
+        self.calender_frame.destroy()
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.lastmonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n last month is : ",
+                                          bg="black", fg="white", font=self.TextFont)
+            self.lastmonthoverall.place(x=20, y=0)
+        else:
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.lastmonthsubjectattendance = Label(self.label_frame,
+                                                    text="Your last month attendance of\n " + self.subject + " is",
+                                                    bg="black", fg="white", font=self.TextFont)
+            self.lastmonthsubjectattendance.place(x=20, y=0)
+            self.now = datetime.datetime.now()
+            self.Calender_frame()
+            self.cal = calendar.month(self.now.year, self.now.month - 1)
+            self.lastmonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
+            self.lastmonthcalendar.place(x=0, y=1)
 
     ###################################################################################################################
     ############################################## About Page #########################################################
@@ -347,15 +436,15 @@ class AttendanceManager(object):
 
     def Content_frame(self):
         self.content_frame = Frame(self.root, height=170, width=650, bg="Black")
-        self.content_frame.place(x=500, y=120)
+        self.content_frame.place(x=500, y=80)
 
     def Label_frame(self):
         self.label_frame = Frame(self.root, height=100, width=550, bg="Black")
-        self.label_frame.place(x=600, y=320)
+        self.label_frame.place(x=580, y=300)
 
     def Calender_frame(self):
-        self.calender_frame = Frame(self.root, height=245, width=325, bg="White")
-        self.calender_frame.place(x=100, y=400)
+        self.calender_frame = Frame(self.root, height=245, width=325, bg="Black")
+        self.calender_frame.place(x=620, y=390)
 
     def create_MainFrame(self, page="Any"):
         self.main_frame = Frame(self.root, height=800, width=1200)
