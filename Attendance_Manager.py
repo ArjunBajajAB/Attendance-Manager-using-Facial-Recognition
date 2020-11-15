@@ -5,6 +5,25 @@ import cv2
 import PIL
 import pyscreenshot as ImageGrab
 import Database as db
+from HelperFunctions import *
+from inception_blocks_v2 import *
+from keras.models import Sequential
+from keras.layers import Conv2D, ZeroPadding2D, Activation, Input, concatenate
+from keras.models import Model
+from keras.layers.normalization import BatchNormalization
+from keras.layers.pooling import MaxPooling2D, AveragePooling2D
+from keras.layers.merge import Concatenate
+from keras.layers.core import Lambda, Flatten, Dense
+from keras.initializers import glorot_uniform
+from keras.engine.topology import Layer
+from keras import backend as K
+K.set_image_data_format('channels_first')
+import os
+import numpy as np
+from numpy import genfromtxt
+import pandas as pd
+
+
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -182,20 +201,65 @@ class AttendanceManager(object):
             self.CameraLabel.after(10, self.ShowFrame)
 
     def ClickImage(self):
-        x1 = self.root.winfo_rootx() + 25 + self.CameraFrame.winfo_x()
-        y1 = self.root.winfo_rooty() + 10 + self.CameraFrame.winfo_y()
-        x2 = x1 + 1150
-        y2 = y1 + 700
-        self.img = ImageGrab.grab((x1,y1,x2,y2))
-        imgpath = "Images/Person.png"
-        self.img.save(imgpath)
+        self.SaveImage()
         self.main_frame.destroy()
         self.create_MainFrame()
+        self.WaitFrame = Frame(self.main_frame, height=400, width=500, bg="black")
+        self.WaitFrame.place(x=500, y=50)
+        self.WaitMessage = Message(self.WaitFrame, bg="black", fg="White", font=self.InfoFont, width=500,
+                                   justify=CENTER,
+                                   text="You are almost there.\n We are confirming your identity\n \n Estimated time 10s")
+        self.WaitMessage.place(x=0, y=0)
+
+
+
+
+        self.cap.release()
+        cv2.destroyAllWindows()
+
+        import tensorflow as tf
+        physical_devices = tf.config.experimental.list_physical_devices("GPU")
+        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+        #Loading our pre trained Face Recognition Model
+        self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
+        self.FRmodel.compile(optimizer = 'adam', loss = triplet_loss, metrics = ['accuracy'])
+        load_weights_from_FaceNet(self.FRmodel)
+        DataBase = db.DataBase
+        self.DictId = int(DataBase["DictId"][DataBase["Name"].str.contains("Arjun Bajaj")])
+        self.ImageData = db.ImgDataDict(self.FRmodel)
+        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",1,self.ImageData,self.FRmodel)
+        self.main_frame.destroy()
+        self.create_MainFrame()
+        self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
+        self.HeadingFrame.place(x=500, y=50)
+        if self.MarkAttendance:
+            self.Heading = Message(self.HeadingFrame,font=self.InfoFont,fg="white",bg="black",width=500,justify=CENTER,
+                                   text="Welcome In!!!")
+            #text="Welcome " + str(db.DataBase["Name"][self.DictId])
+            self.Heading.place(x=0,y=0)
+        else:
+            self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=600,
+                                   justify=CENTER,
+                                   text="Stay Out! You are not you claim to be."+str(self.Distance))
+            self.Heading.place(x=0, y=0)
 
 
     ##############################################################################################################
     ############################################# Attendance Page ################################################
     ##############################################################################################################
+
+    def SaveImage(self):
+        self.x1 = self.root.winfo_rootx() + self.CameraFrame.winfo_x()
+        self.y1 = self.root.winfo_rooty() + self.CameraFrame.winfo_y()
+        self.x2 = self.x1 + 1150
+        self.y2 = self.y1 + 700
+        self.img = ImageGrab.grab((self.x1, self.y1, self.x2, self.y2))
+        imgpath = "Images/Person.jpg"
+        self.img.save(imgpath)
+        self.Image = Image.open("Images/Person.jpg")
+        self.Image = self.Image.resize((96,96),Image.ANTIALIAS)
+        self.Image.save(imgpath,optimize=True,quality=95)
 
     def Check_AttendancePage(self):
         self.main_frame.destroy()
