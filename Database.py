@@ -22,6 +22,6 @@ SubjectsID = {
 
 def ImgDataDict(model):
     ImageData = {}
-    ImageData[int(DataBase["DictId"][DataBase["Name"].str.contains("Hrithik")])] = HelperFunctions.img_to_encoding("Images/hrithik.jpeg",model)
-    ImageData[int(DataBase["DictId"][DataBase["Name"].str.contains("Arjun")])] = HelperFunctions.img_to_encoding("Images/arjun.jpg",model)
+    ImageData["1"] = HelperFunctions.img_to_encoding("Images/arjun.jpg",model)
+    ImageData["2"] = HelperFunctions.img_to_encoding("Images/hrithik.jpeg", model)
     return ImageData
