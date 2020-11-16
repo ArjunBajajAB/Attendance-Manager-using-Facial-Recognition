@@ -116,6 +116,7 @@ class AttendanceManager(object):
 
     def ContinuePage(self):
         self.Name = self.EnterName.get()
+        self.UniName = self.Name
         self.RollNo = self.EnterEnrollmentNo.get()
         self.Course = self.clicked.get()
         self.Semester = self.SelectSemester.get()
@@ -226,24 +227,47 @@ class AttendanceManager(object):
         self.FRmodel.compile(optimizer = 'adam', loss = triplet_loss, metrics = ['accuracy'])
         load_weights_from_FaceNet(self.FRmodel)
         DataBase = db.DataBase
-        self.DictId = int(DataBase["DictId"][DataBase["Name"].str.contains("Arjun Bajaj")])
+        self.DictId = int(DataBase["DictId"][DataBase["Name"].str.contains(self.UniName)])
         self.ImageData = db.ImgDataDict(self.FRmodel)
-        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",1,self.ImageData,self.FRmodel)
+        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",self.DictId,self.ImageData,self.FRmodel)
         self.main_frame.destroy()
         self.create_MainFrame()
         self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
         self.HeadingFrame.place(x=500, y=50)
+        self.ContentFrame = Frame(self.main_frame,height=100,width=750,bg="black")
+        self.ContentFrame.place(x=400,y=100)
+        self.ButtonFrame = Frame(self.main_frame,height=200,width=1000,bg="black")
+        self.ButtonFrame.place(x=200,y=250)
         if self.MarkAttendance:
             self.Heading = Message(self.HeadingFrame,font=self.InfoFont,fg="white",bg="black",width=500,justify=CENTER,
-                                   text="Welcome In!!!")
-            #text="Welcome " + str(db.DataBase["Name"][self.DictId])
+                                   text="Welcome " + str(db.DataBase["Name"][self.DictId]))
+
             self.Heading.place(x=0,y=0)
+            self.InfoMessage = Message(self.ContentFrame,font=self.TextFont,fg="white",bg="black",width=600,justify=CENTER,
+                                       text="Please select from the following subject whose attendance you have to mark")
+            self.InfoMessage.place(x=0,y=10)
+            self.SubjectId = DataBase["SubjectId"][self.DictId]
+            self.SubjectsDict = db.SubjectIdDict()
+            self.SubjectIdList = self.SubjectsDict[self.SubjectId]
+            place = 0
+            for i in self.SubjectIdList:
+                self.SubButton = Button(self.ButtonFrame,text=str(i),fg="black",bg="white",bd=3,activebackground="grey",font=self.ButtonFont,
+                                  height=1,width=7,command=self.MarkInDatabase,justify=CENTER)
+                self.SubButton.place(x=place,y=0)
+                place = place + 200
+            self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",fg="Black",
+                                 command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+            self.ExitButton.place(x=300, y=100)
+
         else:
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=600,
                                    justify=CENTER,
                                    text="Stay Out! You are not you claim to be."+str(self.Distance))
             self.Heading.place(x=0, y=0)
 
+
+    def MarkInDatabase(self):
+        pass
 
     ##############################################################################################################
     ############################################# Attendance Page ################################################
