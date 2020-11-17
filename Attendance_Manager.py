@@ -252,7 +252,7 @@ class AttendanceManager(object):
             place = 0
             for i in self.SubjectIdList:
                 self.SubButton = Button(self.ButtonFrame,text=str(i),fg="black",bg="white",bd=3,activebackground="grey",font=self.ButtonFont,
-                                  height=1,width=7,command=self.MarkInDatabase,justify=CENTER)
+                                  height=1,width=7,command=lambda: self.MarkInDatabase(str(i)),justify=CENTER)
                 self.SubButton.place(x=place,y=0)
                 place = place + 200
             self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",fg="Black",
@@ -266,8 +266,8 @@ class AttendanceManager(object):
             self.Heading.place(x=0, y=0)
 
 
-    def MarkInDatabase(self):
-        pass
+    def MarkInDatabase(self,Subject):
+        self.SubjectDataBase = pd.read_csv("Database/"+Subject + ".csv")
 
     ##############################################################################################################
     ############################################# Attendance Page ################################################
