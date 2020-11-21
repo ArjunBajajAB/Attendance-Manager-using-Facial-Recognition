@@ -10,6 +10,7 @@ from keras.layers.pooling import MaxPooling2D, AveragePooling2D
 import h5py
 import matplotlib.pyplot as plt
 import Database as db
+import mysql.connector
 
 _FLOATX = 'float32'
 
@@ -261,3 +262,15 @@ def verify(image_path, identity, database, model):
         Mark_attendance = False
 
     return dist, Mark_attendance
+
+def ValidateInfo(name,roll):
+    if roll.startswith("0"):
+        roll = roll[1:]
+    mydb = mysql.connector.connect(host="localhost",user="arjun",password="wedding9711",database="AttendanceManager")
+    mycur = mydb.cursor()
+    sql = "select Name from Students where Name='{}' and EnrollmentNumber={}".format(name,roll)
+    mycur.execute(sql)
+    if list(mycur):
+        return True
+    else:
+        return False
