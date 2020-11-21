@@ -22,6 +22,7 @@ import os
 import numpy as np
 from numpy import genfromtxt
 import pandas as pd
+import mysql.connector
 
 
 #Add more libraries here
@@ -126,7 +127,7 @@ class AttendanceManager(object):
                 self.Alert_1 = Label(self.main_frame, text="There are only I TO VI \n Semester in BCA ",
                                      bg="black", fg="white", font=self.TextFont)
                 self.Alert_1.place(x=860, y=360)
-            else:
+            elif ValidateInfo(self.UniName,self.RollNo):
                 self.main_frame.destroy()
                 self.create_MainFrame()
                 self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
