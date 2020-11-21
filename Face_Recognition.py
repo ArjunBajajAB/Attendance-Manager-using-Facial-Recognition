@@ -6,6 +6,7 @@ import datetime
 import cv2
 
 
+
 # Add more libraries here
 
 class AttendanceManager(object):

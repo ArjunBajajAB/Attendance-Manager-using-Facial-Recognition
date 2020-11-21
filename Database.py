@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import csv
+import mysql.connector
 import HelperFunctions
 
 DataBase = pd.read_csv("Database/DataBase.csv")
@@ -28,3 +29,4 @@ def ImgDataDict(model):
     ImageData["1"] = HelperFunctions.img_to_encoding("Images/ArjTest1.jpg",model)
     ImageData["2"] = HelperFunctions.img_to_encoding("Images/hrithik.jpeg", model)
     return ImageData
+
