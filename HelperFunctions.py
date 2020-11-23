@@ -11,6 +11,7 @@ import h5py
 import matplotlib.pyplot as plt
 import Database as db
 import mysql.connector
+import datetime
 
 _FLOATX = 'float32'
 
@@ -234,7 +235,7 @@ def triplet_loss(y_pred, alpha=0.2):
 
     return loss
 
-def verify(image_path, identity, database, model):
+def verify(image_path, identity, model):
     """
     Function that verifies if the person on the "image_path" image is "identity".
 
@@ -251,9 +252,9 @@ def verify(image_path, identity, database, model):
 
     # Step 1: Compute the encoding for the image. Use img_to_encoding() see example above. (≈ 1 line)
     encoding = img_to_encoding(image_path, model)
-
+    ImageEncoding = np.frombuffer(identity,dtype=np.float32)
     # Step 2: Compute distance with identity's image (≈ 1 line)
-    dist = np.linalg.norm(encoding - database[str(identity)])
+    dist = np.linalg.norm(encoding - ImageEncoding)
 
     # Step 3: Open the door if dist < 0.7, else don't open (≈ 3 lines)
     if dist < 0.7:
@@ -263,14 +264,51 @@ def verify(image_path, identity, database, model):
 
     return dist, Mark_attendance
 
-def ValidateInfo(name,roll):
+def ValidateInfo(name,roll,ret=False):
     if roll.startswith("0"):
         roll = roll[1:]
     mydb = mysql.connector.connect(host="localhost",user="arjun",password="wedding9711",database="AttendanceManager")
     mycur = mydb.cursor()
-    sql = "select Name from Students where Name='{}' and EnrollmentNumber={}".format(name,roll)
+    sql = "select Name,ID,SubjectID,ImageEncoding from Students where Name='{}' and EnrollmentNumber={}".format(name,roll)
     mycur.execute(sql)
+    result = list(mycur)
+    if ret==False:
+        if result:
+            return True
+        else:
+            return False
+    elif ret==True:
+        if result:
+            return result[0][1],result[0][2],result[0][3]
+        else:
+            return False
+
+
+def MarkInDatabase(subject,ID):
+    CurrentDate = datetime.datetime.now().strftime("%Y-%m-%d")
+    mydb = mysql.connector.connect(host="localhost", user="arjun", password="wedding9711", database="AttendanceManager")
+    mycur = mydb.cursor()
+    sql = "select * from {} where Date=(%s)".format(subject)
+    val = (CurrentDate,)
+    mycur.execute(sql, val)
     if list(mycur):
-        return True
+        sql = "select * from {} where Date='{}' and PresentID like '%{}%'".format(subject,CurrentDate,ID)
+        mycur.execute(sql)
+        if list(mycur):
+            return "You have already marked your attendance for the subject {}.".format(subject)
+        else:
+            sql = "select PresentID from {} where Date='{}'".format(subject,CurrentDate)
+            mycur.execute(sql)
+            mycurl = str(list(mycur)[0][0])
+            mycurl = mycurl + "," + str(ID)
+
+            sql = "Update {} SET PresentID = {} where Date = '{}' ".format(subject,mycurl,CurrentDate)
+            mycur.execute(sql)
+            mydb.commit()
+            return "Your attendance has been marked for the subject {}!".format(subject)
     else:
-        return False
+        sql = "Insert into {} (Date,PresentID) VALUES (%s,%s)".format(subject)
+        val = (CurrentDate,ID)
+        mycur.execute(sql,val)
+        mydb.commit()
+        return "Your attendance has been marked for the subject {}!".format(subject)
