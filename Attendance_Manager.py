@@ -100,7 +100,7 @@ class AttendanceManager(object):
         self.ResetButton = Button(self.main_frame, text="Reset", activebackground="grey", bd=3, bg="White",
                                   fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7,
                                   command=self.ProceedPage)
-        self.ResetButton.place(x=650, y=470)
+        self.ResetButton.place(x=600, y=470)
 
         self.ContinueButton = Button(self.main_frame, text="Continue", activebackground="grey", bd=3, bg="White",
                                      fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7,
@@ -127,7 +127,7 @@ class AttendanceManager(object):
                 self.Alert_1 = Label(self.main_frame, text="There are only I TO VI \n Semester in BCA ",
                                      bg="black", fg="white", font=self.TextFont)
                 self.Alert_1.place(x=860, y=360)
-            elif ValidateInfo(self.UniName,self.RollNo):
+            elif ValidateInfo(self.UniName,self.RollNo,False):
                 self.main_frame.destroy()
                 self.create_MainFrame()
                 self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
@@ -204,6 +204,8 @@ class AttendanceManager(object):
 
     def ClickImage(self):
         self.SaveImage()
+        self.cap.release()
+        cv2.destroyAllWindows()
         self.main_frame.destroy()
         self.create_MainFrame()
         self.WaitFrame = Frame(self.main_frame, height=400, width=500, bg="black")
@@ -213,12 +215,7 @@ class AttendanceManager(object):
                                    text="You are almost there.\n We are confirming your identity\n \n Estimated time 10s")
         self.WaitMessage.place(x=0, y=0)
 
-
-
-
-        self.cap.release()
-        cv2.destroyAllWindows()
-
+        ID,SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,True)
         import tensorflow as tf
         physical_devices = tf.config.experimental.list_physical_devices("GPU")
         tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -227,48 +224,90 @@ class AttendanceManager(object):
         self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
         self.FRmodel.compile(optimizer = 'adam', loss = triplet_loss, metrics = ['accuracy'])
         load_weights_from_FaceNet(self.FRmodel)
-        DataBase = db.DataBase
-        self.DictId = int(DataBase["DictId"][DataBase["Name"].str.contains(self.UniName)])
-        self.ImageData = db.ImgDataDict(self.FRmodel)
-        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",self.DictId,self.ImageData,self.FRmodel)
+        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",ImageEncoding,self.FRmodel)
+        self.MatchIdentity(ID,SubjectId)
+
+    def MatchIdentity(self,ID,SubjectId):
         self.main_frame.destroy()
         self.create_MainFrame()
         self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
         self.HeadingFrame.place(x=500, y=50)
-        self.ContentFrame = Frame(self.main_frame,height=100,width=750,bg="black")
-        self.ContentFrame.place(x=400,y=100)
-        self.ButtonFrame = Frame(self.main_frame,height=200,width=1000,bg="black")
-        self.ButtonFrame.place(x=200,y=250)
+        self.ButtonFrame = Frame(self.main_frame, height=250, width=1150, bg="black")
+        self.ButtonFrame.place(x=200, y=350)
         if self.MarkAttendance:
-            self.Heading = Message(self.HeadingFrame,font=self.InfoFont,fg="white",bg="black",width=500,justify=CENTER,
-                                   text="Welcome " + str(db.DataBase["Name"][self.DictId]))
+            self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=500,
+                                   justify=CENTER,
+                                   text="Welcome " + self.UniName)
 
-            self.Heading.place(x=0,y=0)
-            self.InfoMessage = Message(self.ContentFrame,font=self.TextFont,fg="white",bg="black",width=600,justify=CENTER,
+            self.Heading.place(x=0, y=0)
+            self.ContentFrame = Frame(self.main_frame, height=100, width=750, bg="black")
+            self.ContentFrame.place(x=400, y=100)
+            self.InfoMessage = Message(self.ContentFrame, font=self.TextFont, fg="white", bg="black", width=600,
+                                       justify=CENTER,
                                        text="Please select from the following subject whose attendance you have to mark")
-            self.InfoMessage.place(x=0,y=10)
-            self.SubjectId = DataBase["SubjectId"][self.DictId]
+            self.InfoMessage.place(x=0, y=10)
             self.SubjectsDict = db.SubjectIdDict()
-            self.SubjectIdList = self.SubjectsDict[self.SubjectId]
-            place = 0
-            for i in self.SubjectIdList:
-                self.SubButton = Button(self.ButtonFrame,text=str(i),fg="black",bg="white",bd=3,activebackground="grey",font=self.ButtonFont,
-                                  height=1,width=7,command=lambda: self.MarkInDatabase(str(i)),justify=CENTER)
-                self.SubButton.place(x=place,y=0)
-                place = place + 200
-            self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",fg="Black",
-                                 command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
-            self.ExitButton.place(x=300, y=100)
+            self.SubjectIdList = self.SubjectsDict[int(SubjectId)]
+            self.SubButton1 = Button(self.ButtonFrame, text=str(self.SubjectIdList[0]), fg="black", bg="white", bd=3,
+                                     activebackground="grey", font=self.ButtonFont,
+                                     height=1, width=6,
+                                     command=lambda: self.MarkInDatabase(str(self.SubjectIdList[0]), ID),
+                                     justify=CENTER)
+            self.SubButton1.place(x=0, y=0)
+
+            self.SubButton2 = Button(self.ButtonFrame, text=str(self.SubjectIdList[1]), fg="black", bg="white", bd=3,
+                                     activebackground="grey", font=self.ButtonFont,
+                                     height=1, width=6,
+                                     command=lambda: self.MarkInDatabase(str(self.SubjectIdList[1]), ID),
+                                     justify=CENTER)
+            self.SubButton2.place(x=200, y=0)
+
+            self.SubButton3 = Button(self.ButtonFrame, text=str(self.SubjectIdList[2]), fg="black", bg="white", bd=3,
+                                     activebackground="grey", font=self.ButtonFont,
+                                     height=1, width=6,
+                                     command=lambda: self.MarkInDatabase(str(self.SubjectIdList[2]), ID),
+                                     justify=CENTER)
+            self.SubButton3.place(x=400, y=0)
+
+            self.SubButton4 = Button(self.ButtonFrame, text=str(self.SubjectIdList[3]), fg="black", bg="white", bd=3,
+                                     activebackground="grey", font=self.ButtonFont,
+                                     height=1, width=6,
+                                     command=lambda: self.MarkInDatabase(str(self.SubjectIdList[3]), ID),
+                                     justify=CENTER)
+            self.SubButton4.place(x=600, y=0)
+            if int(SubjectId) < 5:
+                self.SubButton5 = Button(self.ButtonFrame, text=str(self.SubjectIdList[4]), fg="black", bg="white",
+                                         bd=3,
+                                         activebackground="grey", font=self.ButtonFont,
+                                         height=1, width=6,
+                                         command=lambda: self.MarkInDatabase(str(self.SubjectIdList[4]), ID),
+                                         justify=CENTER)
+                self.SubButton5.place(x=800, y=0)
+
+            self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",
+                                     fg="Black",
+                                     command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+            self.ExitButton.place(x=500, y=150)
 
         else:
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=600,
                                    justify=CENTER,
-                                   text="Stay Out! You are not you claim to be."+str(self.Distance))
+                                   text="Stay Out! Not {}".format(self.UniName))
             self.Heading.place(x=0, y=0)
+            self.TryAgain = Button(self.ButtonFrame,text="Try Again",fg="black", bg="white", bd=3,
+                                     activebackground="grey", font=self.ButtonFont,height=1, width=6,
+                                     command=self.MarkAttendancePage,justify=CENTER)
+            self.TryAgain.place(x=300,y=0)
 
-
-    def MarkInDatabase(self,Subject):
-        self.SubjectDataBase = pd.read_csv("Database/"+Subject + ".csv")
+    def MarkInDatabase(self,subject,ID):
+        self.Message = MarkInDatabase(subject,ID)
+        self.ContentFrame.destroy()
+        self.HeadingFrame.destroy()
+        self.ContentFrame = Frame(self.main_frame, height=200, width=750, bg="black")
+        self.ContentFrame.place(x=400, y=50)
+        self.Heading = Message(self.ContentFrame,font=self.InfoFont,fg="white",bg="black",width=600,justify=CENTER,
+                               text=self.Message + "Please choose any other options now")
+        self.Heading.place(x=0,y=0)
 
     ##############################################################################################################
     ############################################# Attendance Page ################################################
