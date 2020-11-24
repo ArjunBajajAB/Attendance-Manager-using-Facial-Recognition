@@ -21,7 +21,6 @@ K.set_image_data_format('channels_first')
 import os
 import numpy as np
 from numpy import genfromtxt
-import pandas as pd
 import mysql.connector
 
 
@@ -70,14 +69,14 @@ class AttendanceManager(object):
         self.NameLabel = Label(self.main_frame, text="Name     :",bg="black", fg="white", font=self.TextFont)
         self.NameLabel.place(x=600, y=170)
 
-        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="black", fg="white")
+        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")
         self.EnterName.place(x=790, y=170)
 
         self.EnrollmentNoLabel = Label(self.main_frame, text="Enrollment No :", bg="black", fg="white",
                                        font=self.TextFont)
         self.EnrollmentNoLabel.place(x=600, y=240)
 
-        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="black", fg="white")
+        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")
         self.EnterEnrollmentNo.place(x=790, y=240)
 
         self.CourseLabel = Label(self.main_frame, text="Course     :", bg="black", fg="white", font=self.TextFont)
@@ -343,6 +342,7 @@ class AttendanceManager(object):
         self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
         self.SelectSubject.place(x=120, y=70)
 
+        ID,SubjectID = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,"Check")
         self.course = self.clicked.get()
         self.semester = self.SelectSemester.get()
         self.ClickedSubject = StringVar(self.content_frame)

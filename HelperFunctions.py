@@ -282,6 +282,11 @@ def ValidateInfo(name,roll,course,semester,ret=False):
             return result[0][1],result[0][2],result[0][3]
         else:
             return False
+    elif ret=="Check":
+        if result:
+            return result[0][1],result[0][2]
+        else:
+            return False
 
 
 def MarkInDatabase(subject,ID):
