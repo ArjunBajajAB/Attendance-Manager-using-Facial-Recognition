@@ -38,6 +38,7 @@ class AttendanceManager(object):
         self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
         self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
         self.InfoFont = tkFont.Font(family="Courier New", size=25, weight="bold")
+        self.CalFont = tkFont.Font(family="Courier New", size=19, weight="bold")
         self.FirstPage()
         self.root.mainloop()
 
@@ -93,7 +94,7 @@ class AttendanceManager(object):
 
         self.SelectSemester = StringVar(self.main_frame)
         self.SelectSemester.set("Select")
-        self.EnterSemester = OptionMenu(self.main_frame,self.SelectSemester , "I", "II", "III", "IV", "V", "VI", "VII", "VIII")
+        self.EnterSemester = OptionMenu(self.main_frame,self.SelectSemester , "1", "2", "3", "4", "5", "6", "7", "8")
         self.EnterSemester.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
         self.EnterSemester.place(x=790, y=360)
 
@@ -123,11 +124,11 @@ class AttendanceManager(object):
         self.Semester = self.SelectSemester.get()
         self.Name = self.Name.replace(" ", "")
         if self.RollNo.isdigit() and int(len(self.RollNo)) == 11 and self.Name.isalpha() and self.Semester != "Select" and self.Course != "Select":
-            if self.Course == "BCA" and (self.Semester == "VII" or self.Semester == "VIII"):
+            if self.Course == "BCA" and (self.Semester == "7" or self.Semester == "8"):
                 self.Alert_1 = Label(self.main_frame, text="There are only I TO VI \n Semester in BCA ",
                                      bg="black", fg="white", font=self.TextFont)
                 self.Alert_1.place(x=860, y=360)
-            elif ValidateInfo(self.UniName,self.RollNo,False):
+            elif ValidateInfo(self.UniName,self.RollNo,self.Course,int(self.Semester),False):
                 self.main_frame.destroy()
                 self.create_MainFrame()
                 self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
@@ -147,6 +148,13 @@ class AttendanceManager(object):
                                                fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
                                                command=self.ProceedPage)
                 self.BackButton_Check.place(x=650, y=410)
+            else:
+                self.ProceedPage()
+                self.Alert = Label(self.main_frame,
+                                   text="No data found for the entered data!",
+                                   bg="black", fg="white", font=self.TextFont)
+                self.Alert.place(x=590, y=70)
+
         else:
             self.ProceedPage()
             self.Alert = Label(self.main_frame,
@@ -215,16 +223,8 @@ class AttendanceManager(object):
                                    text="You are almost there.\n We are confirming your identity\n \n Estimated time 10s")
         self.WaitMessage.place(x=0, y=0)
 
-        ID,SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,True)
-        import tensorflow as tf
-        physical_devices = tf.config.experimental.list_physical_devices("GPU")
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
-        #Loading our pre trained Face Recognition Model
-        self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
-        self.FRmodel.compile(optimizer = 'adam', loss = triplet_loss, metrics = ['accuracy'])
-        load_weights_from_FaceNet(self.FRmodel)
-        self.Distance, self.MarkAttendance = verify("Images/Person.jpg",ImageEncoding,self.FRmodel)
+        ID,SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,True)
+        self.ModelLoad(ImageEncoding)
         self.MatchIdentity(ID,SubjectId)
 
     def MatchIdentity(self,ID,SubjectId):
@@ -299,6 +299,17 @@ class AttendanceManager(object):
                                      command=self.MarkAttendancePage,justify=CENTER)
             self.TryAgain.place(x=300,y=0)
 
+    def ModelLoad(self,ImageEncoding):
+        import tensorflow as tf
+        physical_devices = tf.config.experimental.list_physical_devices("GPU")
+        tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+        # Loading our pre trained Face Recognition Model
+        self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
+        self.FRmodel.compile(optimizer='adam', loss=triplet_loss, metrics=['accuracy'])
+        load_weights_from_FaceNet(self.FRmodel)
+        self.Distance, self.MarkAttendance = verify("Images/Person.jpg", ImageEncoding, self.FRmodel)
+
     def MarkInDatabase(self,subject,ID):
         self.Message = MarkInDatabase(subject,ID)
         self.ContentFrame.destroy()
@@ -329,66 +340,142 @@ class AttendanceManager(object):
         self.main_frame.destroy()
         self.create_MainFrame()
 
-        self.SelectSubject = Label(self.main_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
-        self.SelectSubject.place(x=600, y=200)
+        self.content_frame = Frame(self.root, height=170, width=650, bg="Black")
+        self.content_frame.place(x=500, y=80)
+
+        self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
+        self.SelectSubject.place(x=120, y=70)
 
         self.course = self.clicked.get()
         self.semester = self.SelectSemester.get()
-        self.ClickedSubject = StringVar(self.main_frame)
+        self.ClickedSubject = StringVar(self.content_frame)
         self.ClickedSubject.set("Select")
         if self.course == "BCA":
             if self.semester == "I":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-I",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-I",
                                                "Techical Communication", "C language", "ICIT", "Physics")
             elif self.semester == "II":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
                                                "DBMS")
             elif self.semester == "III":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
                                                "POA", "C++")
             elif self.semester == "IV":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
                                                "SE", "CN")
             elif self.semester == "V":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
                                                "ST", "BE")
             elif self.semester == "VI":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux",
                                                "M&IA", "BI", "AI", "NS", "NP")
         elif self.course == "B.Tech":
             if self.semester == "I":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-I",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-I",
                                                "Techical Communication", "C language", "ICIT", "Physics-I")
             elif self.semester == "II":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
                                                "DBMS")
             elif self.semester == "III":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
                                                "POA", "C++")
             elif self.semester == "IV":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
                                                "SE", "CN")
             elif self.semester == "V":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
                                                "ST", "BE")
             elif self.semester == "VI":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
             elif self.semester == "VII":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
             elif self.semester == "VIII":
-                self.SubjectEnter = OptionMenu(self.main_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
         self.SubjectEnter.config(bg="Black", fg="White")
-        self.SubjectEnter.place(x=820, y=200)
+        self.SubjectEnter.place(x=343, y=70)
 
-        self.DisplayAttendance = Button(self.main_frame, text="Display Attendance", activebackground="grey", bd=3,
-                                        bg="White",
-                                        fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=16,
-                                        command=self.ShowAttendance)
-        self.DisplayAttendance.place(x=744, y=250)
+        self.OverallAttendance = Button(self.content_frame, text="Overall attendance", activebackground="grey", bd=3,
+                                        bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=19,
+                                        command=self.overallattendance)
+        self.OverallAttendance.place(x=10, y=120)
+
+        self.ThisMonthAttendance = Button(self.content_frame, text="This month's attendance", activebackground="grey",
+                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                          width=21, command=self.thismonthattendance)
+        self.ThisMonthAttendance.place(x=205, y=120)
+
+        self.LastMonthAttendance = Button(self.content_frame, text="Last month's attendance", activebackground="grey",
+                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                          width=21, command=self.lastmonthattendance)
+        self.LastMonthAttendance.place(x=420, y=120)
 
         self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",
                                        fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8)
         self.BackButton_Check.place(x=700, y=680)
+        self.Calender_frame()
+
+    def overallattendance(self):
+        self.calender_frame.destroy()
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.Overallattendance = Label(self.label_frame,
+                                           text="Your Overall Attendance of \n" + self.semester + " Semester is : ",
+                                           bg="black", fg="white", font=self.TextFont)
+            self.Overallattendance.place(x=20, y=0)
+        else:
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.Overallattendance = Label(self.label_frame,
+                                           text="Your Overall Attendance of \n" + self.subject + " is : ",
+                                           bg="black", fg="white", font=self.TextFont)
+            self.Overallattendance.place(x=20, y=0)
+
+    def thismonthattendance(self):
+        self.calender_frame.destroy()
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.thismonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n this month is : ",
+                                          bg="black", fg="white", font=self.TextFont)
+            self.thismonthoverall.place(x=20, y=0)
+        else:
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.thismonthsubjectattendance = Label(self.label_frame,
+                                                    text="Your this month attendance of\n " + self.subject + " is",
+                                                    bg="black", fg="white", font=self.TextFont)
+            self.thismonthsubjectattendance.place(x=20, y=0)
+            self.now = datetime.datetime.now()
+            self.Calender_frame()
+            self.cal = calendar.month(self.now.year, self.now.month)
+            self.thismonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
+            self.thismonthcalendar.place(x=0, y=1)
+
+    def lastmonthattendance(self):
+        self.calender_frame.destroy()
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.label_frame.destroy()
+            self.label_frame = Frame(self.root, height=100, width=550, bg="Black")
+            self.label_frame.place(x=580, y=300)
+            self.lastmonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n last month is : ",
+                                          bg="black", fg="white", font=self.TextFont)
+            self.lastmonthoverall.place(x=20, y=0)
+        else:
+            self.label_frame.destroy()
+            self.Label_frame()
+            self.lastmonthsubjectattendance = Label(self.label_frame,
+                                                    text="Your last month attendance of\n " + self.subject + " is",
+                                                    bg="black", fg="white", font=self.TextFont)
+            self.lastmonthsubjectattendance.place(x=20, y=0)
+            self.now = datetime.datetime.now()
+            self.calender_frame = Frame(self.root, height=245, width=325, bg="Black")
+            self.calender_frame.place(x=620, y=390)
+            self.cal = calendar.month(self.now.year, self.now.month - 1)
+            self.lastmonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
+            self.lastmonthcalendar.place(x=0, y=1)
+
 
     ###################################################################################################################
     ############################################## About Page #########################################################
