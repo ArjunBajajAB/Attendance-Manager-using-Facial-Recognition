@@ -22,6 +22,7 @@ import os
 import numpy as np
 from numpy import genfromtxt
 import mysql.connector
+import tkcalendar
 
 
 #Add more libraries here
@@ -238,7 +239,7 @@ class AttendanceManager(object):
                                        justify=CENTER,
                                        text="Please select from the following subject whose attendance you have to mark")
             self.InfoMessage.place(x=0, y=10)
-            self.SubjectsDict = db.SubjectIdDict()
+            self.SubjectsDict = SubjectIdDict()
             self.SubjectIdList = self.SubjectsDict[int(self.SubjectId)]
             self.ButtonFrame1 = Frame(self.main_frame,bg="black",height=50,width=150)
             self.ButtonFrame1.place(x=200,y=350)
@@ -369,144 +370,64 @@ class AttendanceManager(object):
         self.main_frame.destroy()
         self.create_MainFrame()
 
-        self.content_frame = Frame(self.root, height=170, width=650, bg="Black")
+        self.content_frame = Frame(self.root, height=220, width=650, bg="Black")
         self.content_frame.place(x=500, y=80)
+        self.ButtonFrame = Frame(self.main_frame, bg="black", height=450, width=500)
+        self.ButtonFrame.place(x=620, y=300)
 
         self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
         self.SelectSubject.place(x=120, y=70)
-
+        self.InfoFrame = Frame(self.content_frame,height=50,width=430,bg="black")
+        self.InfoFrame.place(x=120,y=130)
         ID,SubjectID = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,"Check")
-        self.course = self.clicked.get()
-        self.semester = self.SelectSemester.get()
         self.ClickedSubject = StringVar(self.content_frame)
         self.ClickedSubject.set("Select")
-        if self.course == "BCA":
-            if self.semester == "I":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-I",
-                                               "Techical Communication", "C language", "ICIT", "Physics")
-            elif self.semester == "II":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
-                                               "DBMS")
-            elif self.semester == "III":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
-                                               "POA", "C++")
-            elif self.semester == "IV":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
-                                               "SE", "CN")
-            elif self.semester == "V":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
-                                               "ST", "BE")
-            elif self.semester == "VI":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux",
-                                               "M&IA", "BI", "AI", "NS", "NP")
-        elif self.course == "B.Tech":
-            if self.semester == "I":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-I",
-                                               "Techical Communication", "C language", "ICIT", "Physics-I")
-            elif self.semester == "II":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-II", "POM", "DE", "DS",
-                                               "DBMS")
-            elif self.semester == "III":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-III", "CA", "FEDT",
-                                               "POA", "C++")
-            elif self.semester == "IV":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "Maths-IV", "Web.Tech", "Java",
-                                               "SE", "CN")
-            elif self.semester == "V":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "E.com", "CG", "PHP", "OS",
-                                               "ST", "BE")
-            elif self.semester == "VI":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
-            elif self.semester == "VII":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
-            elif self.semester == "VIII":
-                self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, "DWH & DM", "MC", "Linux")
+        self.SubjectsDict = SubjectIdDict()
+        self.SubjectIdList = self.SubjectsDict[int(SubjectID)]
+        if int(SubjectID) < 5:
+            self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, self.SubjectIdList[0], self.SubjectIdList[1],
+                                           self.SubjectIdList[2], self.SubjectIdList[3], self.SubjectIdList[4])
+        else:
+            self.SubjectEnter = OptionMenu(self.content_frame, self.ClickedSubject, self.SubjectIdList[0],  self.SubjectIdList[1],
+                                           self.SubjectIdList[2], self.SubjectIdList[3])
         self.SubjectEnter.config(bg="Black", fg="White")
-        self.SubjectEnter.place(x=343, y=70)
+        self.SubjectEnter.place(x=340, y=70)
 
-        self.OverallAttendance = Button(self.content_frame, text="Overall attendance", activebackground="grey", bd=3,
-                                        bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=19,
-                                        command=self.overallattendance)
-        self.OverallAttendance.place(x=10, y=120)
+        self.OverallAttendance = Button(self.ButtonFrame, text="Overall attendance", activebackground="grey", bd=3,
+                                        bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1, width=21,
+                                        command=lambda: self.Attendance("Overall"))
+        self.OverallAttendance.place(x=0, y=0)
 
-        self.ThisMonthAttendance = Button(self.content_frame, text="This month's attendance", activebackground="grey",
-                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                          width=21, command=self.thismonthattendance)
-        self.ThisMonthAttendance.place(x=205, y=120)
+        self.ThisMonthAttendance = Button(self.ButtonFrame, text="This month's attendance", activebackground="grey",
+                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1,
+                                          width=21, command=lambda: self.Attendance("Current"))
+        self.ThisMonthAttendance.place(x=0, y=100)
 
-        self.LastMonthAttendance = Button(self.content_frame, text="Last month's attendance", activebackground="grey",
-                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                          width=21, command=self.lastmonthattendance)
-        self.LastMonthAttendance.place(x=420, y=120)
+        self.LastMonthAttendance = Button(self.ButtonFrame, text="Last month's attendance", activebackground="grey",
+                                          bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1,
+                                          width=21, command=lambda: self.Attendance("Last"))
+        self.LastMonthAttendance.place(x=0, y=200)
 
-        self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3, bg="White",
-                                       fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8)
-        self.BackButton_Check.place(x=700, y=680)
-        self.Calender_frame()
+        self.BackButton_Check = Button(self.ButtonFrame, text="Back", activebackground="grey", bd=3, bg="White",
+                                       fg="Black", font=self.ButtonFont, justify=CENTER, height=1, width=8,
+                                       command=self.CheckMarkButton)
+        self.BackButton_Check.place(x=0, y=300)
 
-    def overallattendance(self):
-        self.calender_frame.destroy()
+
+    def Attendance(self,month="Current"):
         self.subject = self.ClickedSubject.get()
         if self.subject == "Select":
-            self.Overallattendance = Label(self.label_frame,
-                                           text="Your Overall Attendance of \n" + self.semester + " Semester is : ",
-                                           bg="black", fg="white", font=self.TextFont)
-            self.Overallattendance.place(x=20, y=0)
+            self.Info = Message(self.InfoFrame,text="Please select a Subject",font=self.InfoFont,fg="white",
+                                bg="black",width=400,justify=CENTER)
+            self.Info.place(x=0,y=0)
+
         else:
-            self.label_frame.destroy()
-            self.Label_frame()
-            self.Overallattendance = Label(self.label_frame,
-                                           text="Your Overall Attendance of \n" + self.subject + " is : ",
-                                           bg="black", fg="white", font=self.TextFont)
-            self.Overallattendance.place(x=20, y=0)
-
-    def thismonthattendance(self):
-        self.calender_frame.destroy()
-        self.subject = self.ClickedSubject.get()
-        if self.subject == "Select":
-            self.label_frame.destroy()
-            self.Label_frame()
-            self.thismonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n this month is : ",
-                                          bg="black", fg="white", font=self.TextFont)
-            self.thismonthoverall.place(x=20, y=0)
-        else:
-            self.label_frame.destroy()
-            self.Label_frame()
-            self.thismonthsubjectattendance = Label(self.label_frame,
-                                                    text="Your this month attendance of\n " + self.subject + " is",
-                                                    bg="black", fg="white", font=self.TextFont)
-            self.thismonthsubjectattendance.place(x=20, y=0)
-            self.now = datetime.datetime.now()
-            self.Calender_frame()
-            self.cal = calendar.month(self.now.year, self.now.month)
-            self.thismonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
-            self.thismonthcalendar.place(x=0, y=1)
-
-    def lastmonthattendance(self):
-        self.calender_frame.destroy()
-        self.subject = self.ClickedSubject.get()
-        if self.subject == "Select":
-            self.label_frame.destroy()
-            self.label_frame = Frame(self.root, height=100, width=550, bg="Black")
-            self.label_frame.place(x=580, y=300)
-            self.lastmonthoverall = Label(self.label_frame, text="Your Overall Attendance of\n last month is : ",
-                                          bg="black", fg="white", font=self.TextFont)
-            self.lastmonthoverall.place(x=20, y=0)
-        else:
-            self.label_frame.destroy()
-            self.Label_frame()
-            self.lastmonthsubjectattendance = Label(self.label_frame,
-                                                    text="Your last month attendance of\n " + self.subject + " is",
-                                                    bg="black", fg="white", font=self.TextFont)
-            self.lastmonthsubjectattendance.place(x=20, y=0)
-            self.now = datetime.datetime.now()
-            self.calender_frame = Frame(self.root, height=245, width=325, bg="Black")
-            self.calender_frame.place(x=620, y=390)
-            self.cal = calendar.month(self.now.year, self.now.month - 1)
-            self.lastmonthcalendar = Message(self.calender_frame, text=self.cal, font=self.CalFont)
-            self.lastmonthcalendar.place(x=0, y=1)
-
-
+            self.InfoFrame.destroy()
+            if month == "Current":
+                self.CalenderFrame = Frame(self.content_frame, height=100, width=100, bg="black")
+                self.CalenderFrame.place(x=200, y=300)
+                self.Calender = tkcalendar.Calendar(self.CalenderFrame)
+                self.Calender.place(x=0,y=0)
     ###################################################################################################################
     ############################################## About Page #########################################################
     ###################################################################################################################
