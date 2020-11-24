@@ -129,25 +129,7 @@ class AttendanceManager(object):
                                      bg="black", fg="white", font=self.TextFont)
                 self.Alert_1.place(x=860, y=360)
             elif ValidateInfo(self.UniName,self.RollNo,self.Course,int(self.Semester),False):
-                self.main_frame.destroy()
-                self.create_MainFrame()
-                self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
-                                                          activebackground="grey", bd=3, bg="White",
-                                                          fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                                          width=25, command=self.Check_AttendancePage)
-                self.Check_Your_AttendanceButton.place(x=650, y=210)
-
-                self.Mark_Your_AttendanceButton = Button(self.main_frame, text="Mark your attendance",
-                                                         activebackground="grey", bd=3, bg="White",
-                                                         fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                                         width=25, command=self.MarkAttendancePage)
-                self.Mark_Your_AttendanceButton.place(x=650, y=310)
-
-                self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3,
-                                               bg="White",
-                                               fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
-                                               command=self.ProceedPage)
-                self.BackButton_Check.place(x=650, y=410)
+               self.CheckMarkButton()
             else:
                 self.ProceedPage()
                 self.Alert = Label(self.main_frame,
@@ -161,6 +143,27 @@ class AttendanceManager(object):
                                text="Your name should be name \n\n Enrollment number should be 11 digits only:",
                                bg="black", fg="white", font=self.TextFont)
             self.Alert.place(x=590, y=70)
+
+    def CheckMarkButton(self):
+        self.main_frame.destroy()
+        self.create_MainFrame()
+        self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
+                                                  activebackground="grey", bd=3, bg="White",
+                                                  fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                                  width=25, command=self.Check_AttendancePage)
+        self.Check_Your_AttendanceButton.place(x=650, y=210)
+
+        self.Mark_Your_AttendanceButton = Button(self.main_frame, text="Mark your attendance",
+                                                 activebackground="grey", bd=3, bg="White",
+                                                 fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
+                                                 width=25, command=self.MarkAttendancePage)
+        self.Mark_Your_AttendanceButton.place(x=650, y=310)
+
+        self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3,
+                                       bg="White",
+                                       fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
+                                       command=self.ProceedPage)
+        self.BackButton_Check.place(x=650, y=410)
 
     ##############################################################################################################
     ########################################## 6th Page ############################################################
@@ -212,22 +215,14 @@ class AttendanceManager(object):
 
     def ClickImage(self):
         self.SaveImage()
+        self.Info.destroy()
+        ID,self.SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,True)
+        self.ModelLoad(ImageEncoding)
         self.cap.release()
         cv2.destroyAllWindows()
-        self.main_frame.destroy()
-        self.create_MainFrame()
-        self.WaitFrame = Frame(self.main_frame, height=400, width=500, bg="black")
-        self.WaitFrame.place(x=500, y=50)
-        self.WaitMessage = Message(self.WaitFrame, bg="black", fg="White", font=self.InfoFont, width=500,
-                                   justify=CENTER,
-                                   text="You are almost there.\n We are confirming your identity\n \n Estimated time 10s")
-        self.WaitMessage.place(x=0, y=0)
+        self.MatchIdentity(ID)
 
-        ID,SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,True)
-        self.ModelLoad(ImageEncoding)
-        self.MatchIdentity(ID,SubjectId)
-
-    def MatchIdentity(self,ID,SubjectId):
+    def MatchIdentity(self,ID):
         self.main_frame.destroy()
         self.create_MainFrame()
         self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
@@ -247,7 +242,7 @@ class AttendanceManager(object):
                                        text="Please select from the following subject whose attendance you have to mark")
             self.InfoMessage.place(x=0, y=10)
             self.SubjectsDict = db.SubjectIdDict()
-            self.SubjectIdList = self.SubjectsDict[int(SubjectId)]
+            self.SubjectIdList = self.SubjectsDict[int(self.SubjectId)]
             self.SubButton1 = Button(self.ButtonFrame, text=str(self.SubjectIdList[0]), fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,
                                      height=1, width=6,
@@ -275,7 +270,7 @@ class AttendanceManager(object):
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[3]), ID),
                                      justify=CENTER)
             self.SubButton4.place(x=600, y=0)
-            if int(SubjectId) < 5:
+            if int(self.SubjectId) < 5:
                 self.SubButton5 = Button(self.ButtonFrame, text=str(self.SubjectIdList[4]), fg="black", bg="white",
                                          bd=3,
                                          activebackground="grey", font=self.ButtonFont,
@@ -283,7 +278,9 @@ class AttendanceManager(object):
                                          command=lambda: self.MarkInDatabase(str(self.SubjectIdList[4]), ID),
                                          justify=CENTER)
                 self.SubButton5.place(x=800, y=0)
-
+            self.BackButton = Button(self.ButtonFrame, text="Back", activebackground="grey", bd=3, bg="White",fg="Black",
+                                     command=self.CheckMarkButton, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+            self.BackButton.place(x=300, y=150)
             self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",
                                      fg="Black",
                                      command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
