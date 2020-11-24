@@ -226,8 +226,6 @@ class AttendanceManager(object):
         self.create_MainFrame()
         self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
         self.HeadingFrame.place(x=500, y=50)
-        self.ButtonFrame = Frame(self.main_frame, height=250, width=1150, bg="black")
-        self.ButtonFrame.place(x=200, y=350)
         if self.MarkAttendance:
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=500,
                                    justify=CENTER,
@@ -242,58 +240,93 @@ class AttendanceManager(object):
             self.InfoMessage.place(x=0, y=10)
             self.SubjectsDict = db.SubjectIdDict()
             self.SubjectIdList = self.SubjectsDict[int(self.SubjectId)]
-            self.SubButton1 = Button(self.ButtonFrame, text=str(self.SubjectIdList[0]), fg="black", bg="white", bd=3,
+            self.ButtonFrame1 = Frame(self.main_frame,bg="black",height=50,width=150)
+            self.ButtonFrame1.place(x=200,y=350)
+            self.SubButton1 = Button(self.ButtonFrame1, text=str(self.SubjectIdList[0]), fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,
                                      height=1, width=6,
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[0]), ID),
                                      justify=CENTER)
             self.SubButton1.place(x=0, y=0)
 
-            self.SubButton2 = Button(self.ButtonFrame, text=str(self.SubjectIdList[1]), fg="black", bg="white", bd=3,
+            self.ButtonFrame2 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame2.place(x=400, y=350)
+            self.SubButton2 = Button(self.ButtonFrame2, text=str(self.SubjectIdList[1]), fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,
                                      height=1, width=6,
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[1]), ID),
                                      justify=CENTER)
-            self.SubButton2.place(x=200, y=0)
+            self.SubButton2.place(x=0, y=0)
 
-            self.SubButton3 = Button(self.ButtonFrame, text=str(self.SubjectIdList[2]), fg="black", bg="white", bd=3,
+            self.ButtonFrame3 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame3.place(x=600, y=350)
+            self.SubButton3 = Button(self.ButtonFrame3, text=str(self.SubjectIdList[2]), fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,
                                      height=1, width=6,
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[2]), ID),
                                      justify=CENTER)
-            self.SubButton3.place(x=400, y=0)
+            self.SubButton3.place(x=0, y=0)
 
-            self.SubButton4 = Button(self.ButtonFrame, text=str(self.SubjectIdList[3]), fg="black", bg="white", bd=3,
+            self.ButtonFrame4 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame4.place(x=800, y=350)
+            self.SubButton4 = Button(self.ButtonFrame4, text=str(self.SubjectIdList[3]), fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,
                                      height=1, width=6,
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[3]), ID),
                                      justify=CENTER)
-            self.SubButton4.place(x=600, y=0)
+            self.SubButton4.place(x=0, y=0)
             if int(self.SubjectId) < 5:
-                self.SubButton5 = Button(self.ButtonFrame, text=str(self.SubjectIdList[4]), fg="black", bg="white",
+                self.ButtonFrame5 = Frame(self.main_frame, bg="black", height=50, width=150)
+                self.ButtonFrame5.place(x=1000, y=350)
+                self.SubButton5 = Button(self.ButtonFrame5, text=str(self.SubjectIdList[4]), fg="black", bg="white",
                                          bd=3,
                                          activebackground="grey", font=self.ButtonFont,
                                          height=1, width=6,
                                          command=lambda: self.MarkInDatabase(str(self.SubjectIdList[4]), ID),
                                          justify=CENTER)
-                self.SubButton5.place(x=800, y=0)
-            self.BackButton = Button(self.ButtonFrame, text="Back", activebackground="grey", bd=3, bg="White",fg="Black",
+                self.SubButton5.place(x=0, y=0)
+
+            self.ButtonFrame6 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame6.place(x=500, y=450)
+
+            self.BackButton = Button(self.ButtonFrame6, text="Back", activebackground="grey", bd=3, bg="White",fg="Black",
                                      command=self.CheckMarkButton, font=self.ButtonFont, justify=CENTER, height=1, width=7)
-            self.BackButton.place(x=300, y=150)
-            self.ExitButton = Button(self.ButtonFrame, text="Exit", activebackground="grey", bd=3, bg="White",
+            self.BackButton.place(x=0, y=0)
+
+            self.ButtonFrame7 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame7.place(x=700, y=450)
+            self.ExitButton = Button(self.ButtonFrame7, text="Exit", activebackground="grey", bd=3, bg="White",
                                      fg="Black",
                                      command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
-            self.ExitButton.place(x=500, y=150)
+            self.ExitButton.place(x=0, y=0)
 
         else:
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=600,
                                    justify=CENTER,
                                    text="Stay Out! Not {}".format(self.UniName))
             self.Heading.place(x=0, y=0)
-            self.TryAgain = Button(self.ButtonFrame,text="Try Again",fg="black", bg="white", bd=3,
+            self.ButtonFrame1 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame1.place(x=500, y=350)
+            self.TryAgain = Button(self.ButtonFrame1,text="Try Again",fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,height=1, width=6,
                                      command=self.MarkAttendancePage,justify=CENTER)
-            self.TryAgain.place(x=300,y=0)
+            self.TryAgain.place(x=0,y=0)
+
+            self.ButtonFrame6 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame6.place(x=700, y=350)
+
+            self.BackButton = Button(self.ButtonFrame6, text="Back", activebackground="grey", bd=3, bg="White",
+                                     fg="Black",
+                                     command=self.CheckMarkButton, font=self.ButtonFont, justify=CENTER, height=1,
+                                     width=7)
+            self.BackButton.place(x=0, y=0)
+
+            self.ButtonFrame7 = Frame(self.main_frame, bg="black", height=50, width=150)
+            self.ButtonFrame7.place(x=900, y=350)
+            self.ExitButton = Button(self.ButtonFrame7, text="Exit", activebackground="grey", bd=3, bg="White",
+                                     fg="Black",
+                                     command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
+            self.ExitButton.place(x=0, y=0)
 
     def ModelLoad(self,ImageEncoding):
         import tensorflow as tf
