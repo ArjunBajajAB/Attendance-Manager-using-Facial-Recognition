@@ -334,3 +334,38 @@ SubjectsID = {
 }
 def SubjectIdDict():
     return SubjectsID
+
+def DatabaseAttendance(month,year,subject,Id,attendance="overall"):
+    mydb = mysql.connector.connect(host="localhost", user="arjun", password="wedding9711", database="AttendanceManager")
+    mycur = mydb.cursor()
+    if attendance == "overall":
+        sql1 = "Select Date from {} where PresentID like '%{}%'".format(subject,Id)
+        sql2 = "Select Date from {} ".format(subject)
+        mycur.execute(sql1)
+        a = list(mycur)
+        present = len(a)
+        mycur.execute(sql2)
+        b = list(mycur)
+        total = len(b)
+        if total > 0:
+            percentage = (present / total) * 100
+            return present, total, percentage
+        else:
+            return False, False, False
+    else:
+        from calendar import monthrange
+        a = monthrange(year, month)[1]
+        sql1 = "Select Date from {} where Date>=(%s) and Date<=(%s) and PresentID like '%{}%'".format(subject,Id)
+        sql2 = "Select Date from {} where Date>=(%s) and Date<=(%s)".format(subject)
+        val1= (str(year)+"-"+str(month)+"-01",str(year)+"-"+str(month)+"-"+str(a))
+        mycur.execute(sql1,val1)
+        a = list(mycur)
+        present = len(a)
+        mycur.execute(sql2,val1)
+        b = list(mycur)
+        total = len(b)
+        if total>0:
+            percentage = (present / total) * 100
+            return present,total,percentage
+        else:
+            return False,False,False
