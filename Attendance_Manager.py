@@ -25,6 +25,7 @@ import mysql.connector
 import tkcalendar
 
 
+
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -377,9 +378,9 @@ class AttendanceManager(object):
 
         self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
         self.SelectSubject.place(x=120, y=70)
-        self.InfoFrame = Frame(self.content_frame,height=50,width=430,bg="black")
+        self.InfoFrame = Frame(self.content_frame,height=90,width=430,bg="black")
         self.InfoFrame.place(x=120,y=130)
-        ID,SubjectID = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,"Check")
+        self.ID,SubjectID = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,"Check")
         self.ClickedSubject = StringVar(self.content_frame)
         self.ClickedSubject.set("Select")
         self.SubjectsDict = SubjectIdDict()
@@ -395,12 +396,12 @@ class AttendanceManager(object):
 
         self.OverallAttendance = Button(self.ButtonFrame, text="Overall attendance", activebackground="grey", bd=3,
                                         bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1, width=21,
-                                        command=lambda: self.Attendance("Overall"))
+                                        command=self.TotalAttendance)
         self.OverallAttendance.place(x=0, y=0)
 
         self.ThisMonthAttendance = Button(self.ButtonFrame, text="This month's attendance", activebackground="grey",
                                           bd=3, bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1,
-                                          width=21, command=lambda: self.Attendance("Current"))
+                                          width=21, command=lambda: self.Attendance(month="Current"))
         self.ThisMonthAttendance.place(x=0, y=100)
 
         self.LastMonthAttendance = Button(self.ButtonFrame, text="Last month's attendance", activebackground="grey",
@@ -413,6 +414,28 @@ class AttendanceManager(object):
                                        command=self.CheckMarkButton)
         self.BackButton_Check.place(x=0, y=300)
 
+    def TotalAttendance(self):
+        self.subject = self.ClickedSubject.get()
+        if self.subject == "Select":
+            self.Info = Message(self.InfoFrame, text="Please select a Subject", font=self.InfoFont, fg="white",
+                                bg="black", width=400, justify=CENTER)
+            self.Info.place(x=0, y=0)
+        else:
+            self.Date = datetime.datetime.now()
+            self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
+            self.AttendanceFrame.place(x=100, y=300)
+            self.InfoFrame.destroy()
+            self.MonthPresent, self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date.month, self.Date.year,
+                                                                                            self.subject, self.ID)
+            if self.MonthTotal:
+                text = "Your overall attendance for the subject {} is {}/{} which is {}%".format(self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
+            else:
+                text = "No attendance found for this subject!"
+            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
+                                             text=text)
+            self.AttendanceDisplay.place(x=0,y=0)
+
+
 
     def Attendance(self,month="Current"):
         self.subject = self.ClickedSubject.get()
@@ -422,12 +445,22 @@ class AttendanceManager(object):
             self.Info.place(x=0,y=0)
 
         else:
+            self.Date = datetime.datetime.now()
+            self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
+            self.AttendanceFrame.place(x=100, y=300)
             self.InfoFrame.destroy()
             if month == "Current":
-                self.CalenderFrame = Frame(self.content_frame, height=100, width=100, bg="black")
-                self.CalenderFrame.place(x=200, y=300)
-                self.Calender = tkcalendar.Calendar(self.CalenderFrame)
-                self.Calender.place(x=0,y=0)
+                self.MonthPresent,self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date.month,self.Date.year,self.subject,self.ID,"Current")
+            else:
+                self.MonthPresent,self.MonthTotal,self.AttendancePercent = DatabaseAttendance(self.Date.month-1,self.Date.year,self.subject, self.ID,"Last")
+            if self.MonthTotal:
+                text = "Your attendance for the month {} and subject {} is {}/{} which is {}%".format(self.Date.month,self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
+            else:
+                text = "No attendance found for this month in this subject."
+            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
+                                             text=text)
+            self.AttendanceDisplay.place(x=0,y=0)
+
     ###################################################################################################################
     ############################################## About Page #########################################################
     ###################################################################################################################
