@@ -81,3 +81,8 @@ The first edition is doing good when the user captures his/her image in bright l
 ## Need Update
 
 The project is the first edition. I will keep update.
+
+## References
+For backend deep learning model-
+1. deeplearning.ai course Convolutional Neural Networks taught by Andrew Ng
+2. FaceNet: A Unified Embedding for Face Recognition and Clustering 2015
