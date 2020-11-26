@@ -1,31 +1,12 @@
 from tkinter import * #For designing of front end
 from PIL import ImageTk, Image #For loading images
 from tkinter import font as tkFont
-import cv2
 import PIL
 import pyscreenshot as ImageGrab
-import Database as db
 from HelperFunctions import *
 from inception_blocks_v2 import *
-from keras.models import Sequential
-from keras.layers import Conv2D, ZeroPadding2D, Activation, Input, concatenate
-from keras.models import Model
-from keras.layers.normalization import BatchNormalization
-from keras.layers.pooling import MaxPooling2D, AveragePooling2D
-from keras.layers.merge import Concatenate
-from keras.layers.core import Lambda, Flatten, Dense
-from keras.initializers import glorot_uniform
-from keras.engine.topology import Layer
 from keras import backend as K
 K.set_image_data_format('channels_first')
-import os
-import numpy as np
-from numpy import genfromtxt
-import mysql.connector
-import tkcalendar
-
-
-
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -36,10 +17,13 @@ class AttendanceManager(object):
         self.root.title("Attendance Manager")
         self.root.resizable(0,0)  #to disable resizing of root window to avoid distortion
         self.BackgroundImage(self.root)
+
+        # Tkinter fonts intialized into variables for further use
         self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
         self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
         self.InfoFont = tkFont.Font(family="Courier New", size=25, weight="bold")
-        self.CalFont = tkFont.Font(family="Courier New", size=19, weight="bold")
+
+        #Calling the first page function
         self.FirstPage()
         self.root.mainloop()
 
@@ -48,7 +32,7 @@ class AttendanceManager(object):
     #################################################################################################################
 
     def FirstPage(self):
-        self.create_MainFrame("First")
+        self.create_MainFrame("First") #Calling the create_MainFrame function with "First" argument so as to specify background image
         self.content_frame = Frame(self.main_frame,height=300,width=700,bg="Black")
         self.content_frame.place(x=500,y=550)  #Place below heading
         self.ProceedButton = Button(self.content_frame,text="Proceed",activebackground="grey",bd=3,bg="White",fg="Black",
@@ -67,25 +51,25 @@ class AttendanceManager(object):
 
     def ProceedPage(self):
         self.main_frame.destroy()  #Destroy the entire main frame and create a new page
-        self.create_MainFrame()
+        self.create_MainFrame()  #without "First" argument so as to change the background Image
         self.NameLabel = Label(self.main_frame, text="Name     :",bg="black", fg="white", font=self.TextFont)
         self.NameLabel.place(x=600, y=170)
 
-        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")
+        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")  #Entry widget for name
         self.EnterName.place(x=790, y=170)
 
         self.EnrollmentNoLabel = Label(self.main_frame, text="Enrollment No :", bg="black", fg="white",
                                        font=self.TextFont)
         self.EnrollmentNoLabel.place(x=600, y=240)
 
-        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")
+        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black") #Entry widget for enrollment
         self.EnterEnrollmentNo.place(x=790, y=240)
 
         self.CourseLabel = Label(self.main_frame, text="Course     :", bg="black", fg="white", font=self.TextFont)
         self.CourseLabel.place(x=600, y=300)
 
         self.clicked = StringVar(self.main_frame)
-        self.clicked.set("Select")
+        self.clicked.set("Select") #By default no subject is selected
         self.CourseEnter = OptionMenu(self.main_frame, self.clicked, "BCA", "B.Tech")
         self.CourseEnter.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
         self.CourseEnter.place(x=790, y=300)
@@ -94,11 +78,12 @@ class AttendanceManager(object):
         self.SemesterLabel.place(x=600, y=360)
 
         self.SelectSemester = StringVar(self.main_frame)
-        self.SelectSemester.set("Select")
+        self.SelectSemester.set("Select") #By default no semester is selected
         self.EnterSemester = OptionMenu(self.main_frame,self.SelectSemester , "1", "2", "3", "4", "5", "6", "7", "8")
         self.EnterSemester.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
         self.EnterSemester.place(x=790, y=360)
 
+        #All the buttons for submit/reset/back functionality
         self.ResetButton = Button(self.main_frame, text="Reset", activebackground="grey", bd=3, bg="White",
                                   fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=7,
                                   command=self.ProceedPage)
@@ -123,7 +108,9 @@ class AttendanceManager(object):
         self.RollNo = self.EnterEnrollmentNo.get()
         self.Course = self.clicked.get()
         self.Semester = self.SelectSemester.get()
-        self.Name = self.Name.replace(" ", "")
+        self.Name = self.Name.replace(" ", "") #To remove spaces to perform string operations
+
+        #Validating the crediantials entered by the user, Both the syntax and data as per database
         if self.RollNo.isdigit() and int(len(self.RollNo)) == 11 and self.Name.isalpha() and self.Semester != "Select" and self.Course != "Select":
             if self.Course == "BCA" and (self.Semester == "7" or self.Semester == "8"):
                 self.Alert_1 = Label(self.main_frame, text="There are only I TO VI \n Semester in BCA ",
@@ -134,10 +121,11 @@ class AttendanceManager(object):
             else:
                 self.ProceedPage()
                 self.Alert = Label(self.main_frame,
-                                   text="No data found for the entered data!",
+                                   text="No data found for the entered credentials!",
                                    bg="black", fg="white", font=self.TextFont)
                 self.Alert.place(x=590, y=70)
 
+        #If syntax is wrong print error message
         else:
             self.ProceedPage()
             self.Alert = Label(self.main_frame,
@@ -145,8 +133,12 @@ class AttendanceManager(object):
                                bg="black", fg="white", font=self.TextFont)
             self.Alert.place(x=590, y=70)
 
+    ##############################################################################################################
+    ####################################### Check/Mark Attendance Page ###########################################
+    ##############################################################################################################
+
     def CheckMarkButton(self):
-        self.main_frame.destroy()
+        self.main_frame.destroy() #Destroy previous page
         self.create_MainFrame()
         self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
                                                   activebackground="grey", bd=3, bg="White",
@@ -167,22 +159,8 @@ class AttendanceManager(object):
         self.BackButton_Check.place(x=650, y=410)
 
     ##############################################################################################################
-    ########################################## 6th Page ############################################################
+    ########################################## Mark Attendance Page ##############################################
     ##############################################################################################################
-
-    def ShowAttendance(self):
-        self.subject = self.ClickedSubject.get()
-        if self.subject == "Select":
-            self.alert = Label(self.main_frame, text="!Select subject", bg="black", fg="white", font=self.TextFont)
-            self.alert.place(x=600, y=100)
-        else:
-            # self.alert.destroy()
-            self.ShowSubjectAttendance = Label(self.main_frame, text="Your attendance of " + self.subject + " is ",
-                                               bg="black", fg="white", font=self.TextFont)
-            self.ShowSubjectAttendance.place(x=600, y=350)
-
-    ############################################ 7th Page #########################################################
-
     def MarkAttendancePage(self):
         self.main_frame.destroy()
         self.create_MainFrame()
@@ -190,10 +168,12 @@ class AttendanceManager(object):
         self.CameraFrame.place(x=25,y=10)
         self.CameraLabel = Label(self.CameraFrame,height=700,width=1150)
         self.CameraLabel.place(x=0,y=0)
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(0) #Open webcam
+
+        # set height and width of camera frame
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,700)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,1150)
-        self.ShowFrame()
+        self.ShowFrame() #calling the function for streaming the video from webcam
         self.ContentFrame = Frame(self.main_frame,height=70,width=1050,bg="black")
         self.ContentFrame.place(x=100,y=720)
         self.Info = Message(self.ContentFrame,text="Please try to adjust you entire face in the video frame and then press the Click Button",
@@ -204,31 +184,63 @@ class AttendanceManager(object):
         self.ClickButton.place(x=850,y=0)
 
     def ShowFrame(self):
+        # Function to continuosly read from webcam videeo stream and display it
         ret, frame = self.cap.read()
         if ret:
-            self.frame = cv2.flip(frame, 1)
-            self.frame = cv2.cvtColor(self.frame,cv2.COLOR_BGR2RGBA)
-            self.img = PIL.Image.fromarray(self.frame)
-            self.imgtk = ImageTk.PhotoImage(image=self.img)
-            self.CameraLabel.img = self.imgtk
-            self.CameraLabel.configure(image=self.imgtk)
-            self.CameraLabel.after(10, self.ShowFrame)
+            self.frame = cv2.flip(frame, 1) #flip video stream so as to avoid mirroring
+            self.frame = cv2.cvtColor(self.frame,cv2.COLOR_BGR2RGBA) #Convert video stream color to RGB from BGR
+            self.img = PIL.Image.fromarray(self.frame) #Create an Image from array of pixels
+            self.imgtk = ImageTk.PhotoImage(image=self.img) #Create , store that image
+            self.CameraLabel.img = self.imgtk #Display that image
+            self.CameraLabel.configure(image=self.imgtk) #set the image in the frame
+            self.CameraLabel.after(10, self.ShowFrame) #loop after 10ms so that video stream is continously displayed
 
     def ClickImage(self):
-        self.SaveImage()
+        self.SaveImage() #to save the image
         self.Info.destroy()
         ID,self.SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,True)
         self.ModelLoad(ImageEncoding)
-        self.cap.release()
-        cv2.destroyAllWindows()
+        self.cap.release() #release video frame variables
+        cv2.destroyAllWindows() #destroy the camera window and shut down the webcam
         self.MatchIdentity(ID)
+
+    def SaveImage(self):
+        #Function to capture the image of the user in webcam when user presses "Click"
+        self.x1 = self.root.winfo_rootx() + self.CameraFrame.winfo_x() #top left coordinate x
+        self.y1 = self.root.winfo_rooty() + self.CameraFrame.winfo_y() #top left coordinate y
+        self.x2 = self.x1 + 1150    #bottom right coordinate x
+        self.y2 = self.y1 + 700     #bottom right coordinate y
+        self.img = ImageGrab.grab((self.x1, self.y1, self.x2, self.y2)) #Grab the image
+        imgpath = "Images/Person.jpg"
+        self.img.save(imgpath) #store the image at this path
+        self.Image = Image.open("Images/Person.jpg")
+        self.Image = self.Image.resize((96,96),Image.ANTIALIAS) #Open the image and resize it to 96x96 with AntiAliasing
+        self.Image.save(imgpath,optimize=True,quality=95) #Save the resized image
+
+    def ModelLoad(self,ImageEncoding):
+        #Load our FaceNet model for comparing database image and one captured by the webcam
+        import tensorflow as tf
+        physical_devices = tf.config.experimental.list_physical_devices("GPU") #Check available GPUs
+        tf.config.experimental.set_memory_growth(physical_devices[0], True) #Allow expanding VRAM memory of GPU
+
+        # Loading our pre trained Face Recognition Model
+        self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
+        self.FRmodel.compile(optimizer='adam', loss=triplet_loss, metrics=['accuracy'])
+        load_weights_from_FaceNet(self.FRmodel)
+
+        #Calling verify function from HelperFunctions to match the distance of Database Image and webcam image
+        self.Distance, self.MarkAttendance = verify("Images/Person.jpg", ImageEncoding, self.FRmodel)
+
+    ##############################################################################################################
+    ########################################## Subject Selection Page for marking attendance #####################
+    ##############################################################################################################
 
     def MatchIdentity(self,ID):
         self.main_frame.destroy()
         self.create_MainFrame()
         self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
         self.HeadingFrame.place(x=500, y=50)
-        if self.MarkAttendance:
+        if self.MarkAttendance: #If identity has been matched and verified
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=500,
                                    justify=CENTER,
                                    text="Welcome " + self.UniName)
@@ -242,6 +254,8 @@ class AttendanceManager(object):
             self.InfoMessage.place(x=0, y=10)
             self.SubjectsDict = SubjectIdDict()
             self.SubjectIdList = self.SubjectsDict[int(self.SubjectId)]
+
+            #Buttons for all the subject of that student
             self.ButtonFrame1 = Frame(self.main_frame,bg="black",height=50,width=150)
             self.ButtonFrame1.place(x=200,y=350)
             self.SubButton1 = Button(self.ButtonFrame1, text=str(self.SubjectIdList[0]), fg="black", bg="white", bd=3,
@@ -277,7 +291,7 @@ class AttendanceManager(object):
                                      command=lambda: self.MarkInDatabase(str(self.SubjectIdList[3]), ID),
                                      justify=CENTER)
             self.SubButton4.place(x=0, y=0)
-            if int(self.SubjectId) < 5:
+            if int(self.SubjectId) < 5: #If subjectID is <5 meaning student is in 1st/2nd year according to database
                 self.ButtonFrame5 = Frame(self.main_frame, bg="black", height=50, width=150)
                 self.ButtonFrame5.place(x=1000, y=350)
                 self.SubButton5 = Button(self.ButtonFrame5, text=str(self.SubjectIdList[4]), fg="black", bg="white",
@@ -302,13 +316,14 @@ class AttendanceManager(object):
                                      command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
             self.ExitButton.place(x=0, y=0)
 
-        else:
+        else: #If identity is matched and not verified
             self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=600,
                                    justify=CENTER,
                                    text="Stay Out! Not {}".format(self.UniName))
             self.Heading.place(x=0, y=0)
             self.ButtonFrame1 = Frame(self.main_frame, bg="black", height=50, width=150)
             self.ButtonFrame1.place(x=500, y=350)
+            #Give user a chance to capture his image again using webcam
             self.TryAgain = Button(self.ButtonFrame1,text="Try Again",fg="black", bg="white", bd=3,
                                      activebackground="grey", font=self.ButtonFont,height=1, width=6,
                                      command=self.MarkAttendancePage,justify=CENTER)
@@ -330,42 +345,22 @@ class AttendanceManager(object):
                                      command=exit, font=self.ButtonFont, justify=CENTER, height=1, width=7)
             self.ExitButton.place(x=0, y=0)
 
-    def ModelLoad(self,ImageEncoding):
-        import tensorflow as tf
-        physical_devices = tf.config.experimental.list_physical_devices("GPU")
-        tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
-        # Loading our pre trained Face Recognition Model
-        self.FRmodel = faceRecoModel(input_shape=(3, 96, 96))
-        self.FRmodel.compile(optimizer='adam', loss=triplet_loss, metrics=['accuracy'])
-        load_weights_from_FaceNet(self.FRmodel)
-        self.Distance, self.MarkAttendance = verify("Images/Person.jpg", ImageEncoding, self.FRmodel)
 
     def MarkInDatabase(self,subject,ID):
-        self.Message = MarkInDatabase(subject,ID)
+        #Call MarkInDatabase function from HelperFunctions to mark the attendance
+        self.Message = MarkInDatabase(subject,ID)  #Return message from the function
         self.ContentFrame.destroy()
         self.HeadingFrame.destroy()
         self.ContentFrame = Frame(self.main_frame, height=200, width=750, bg="black")
         self.ContentFrame.place(x=400, y=50)
+        #Display the returned message
         self.Heading = Message(self.ContentFrame,font=self.InfoFont,fg="white",bg="black",width=600,justify=CENTER,
-                               text=self.Message + "Please choose any other options now")
+                               text=self.Message + "\nPlease choose any other options now")
         self.Heading.place(x=0,y=0)
 
     ##############################################################################################################
-    ############################################# Attendance Page ################################################
+    ############################################# Check Attendance Page ##########################################
     ##############################################################################################################
-
-    def SaveImage(self):
-        self.x1 = self.root.winfo_rootx() + self.CameraFrame.winfo_x()
-        self.y1 = self.root.winfo_rooty() + self.CameraFrame.winfo_y()
-        self.x2 = self.x1 + 1150
-        self.y2 = self.y1 + 700
-        self.img = ImageGrab.grab((self.x1, self.y1, self.x2, self.y2))
-        imgpath = "Images/Person.jpg"
-        self.img.save(imgpath)
-        self.Image = Image.open("Images/Person.jpg")
-        self.Image = self.Image.resize((96,96),Image.ANTIALIAS)
-        self.Image.save(imgpath,optimize=True,quality=95)
 
     def Check_AttendancePage(self):
         self.main_frame.destroy()
@@ -380,9 +375,12 @@ class AttendanceManager(object):
         self.SelectSubject.place(x=120, y=70)
         self.InfoFrame = Frame(self.content_frame,height=90,width=430,bg="black")
         self.InfoFrame.place(x=120,y=130)
+
+        #Get subject ID and ID from database
         self.ID,SubjectID = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,"Check")
         self.ClickedSubject = StringVar(self.content_frame)
-        self.ClickedSubject.set("Select")
+        self.ClickedSubject.set("Select") #By default no subject is selected
+        # Dictionary that returns a dictionary with subjectId as key and list of subjects as values
         self.SubjectsDict = SubjectIdDict()
         self.SubjectIdList = self.SubjectsDict[int(SubjectID)]
         if int(SubjectID) < 5:
@@ -415,47 +413,49 @@ class AttendanceManager(object):
         self.BackButton_Check.place(x=0, y=300)
 
     def TotalAttendance(self):
+        #Function for displaying overall attendance of a subject
         self.subject = self.ClickedSubject.get()
-        if self.subject == "Select":
+        if self.subject == "Select": #If not subject is selected return a error
             self.Info = Message(self.InfoFrame, text="Please select a Subject", font=self.InfoFont, fg="white",
                                 bg="black", width=400, justify=CENTER)
             self.Info.place(x=0, y=0)
-        else:
-            self.Date = datetime.datetime.now()
+        else: #If a subject is selected
+            self.Date = datetime.datetime.now() #Get current date
             self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
             self.AttendanceFrame.place(x=100, y=300)
             self.InfoFrame.destroy()
+            #Get the overall attendance from the database by calling this function from HelperFunctions
             self.MonthPresent, self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date.month, self.Date.year,
                                                                                             self.subject, self.ID)
+            #If the return value is not false , i.e. there are some attendance records
             if self.MonthTotal:
                 text = "Your overall attendance for the subject {} is {}/{} which is {}%".format(self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
-            else:
+            else: #If return value is False, i.e. not attendance record
                 text = "No attendance found for this subject!"
             self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
                                              text=text)
             self.AttendanceDisplay.place(x=0,y=0)
 
-
-
     def Attendance(self,month="Current"):
+        #Function for displaying this month and last month's attendance
         self.subject = self.ClickedSubject.get()
-        if self.subject == "Select":
+        if self.subject == "Select": #return error if no subject is selected
             self.Info = Message(self.InfoFrame,text="Please select a Subject",font=self.InfoFont,fg="white",
                                 bg="black",width=400,justify=CENTER)
             self.Info.place(x=0,y=0)
 
         else:
-            self.Date = datetime.datetime.now()
+            self.Date = datetime.datetime.now() #get current date
             self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
             self.AttendanceFrame.place(x=100, y=300)
             self.InfoFrame.destroy()
-            if month == "Current":
+            if month == "Current": #to display this month's attendance
                 self.MonthPresent,self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date.month,self.Date.year,self.subject,self.ID,"Current")
-            else:
+            else: #to display previous month's attendance
                 self.MonthPresent,self.MonthTotal,self.AttendancePercent = DatabaseAttendance(self.Date.month-1,self.Date.year,self.subject, self.ID,"Last")
-            if self.MonthTotal:
+            if self.MonthTotal: #If return value is not False and record exists
                 text = "Your attendance for the month {} and subject {} is {}/{} which is {}%".format(self.Date.month,self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
-            else:
+            else: #If no record exists and return value is false
                 text = "No attendance found for this month in this subject."
             self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
                                              text=text)
@@ -466,10 +466,11 @@ class AttendanceManager(object):
     ###################################################################################################################
 
     def AboutPage(self):
+        #About the developer of the Project
         self.content_frame.destroy() #Just destroy the content frame as the heading is needed
         self.content_frame = Frame(self.main_frame, height=300, width=700, bg="Black")
         self.content_frame.place(x=500, y=450)  # Place below heading
-        self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun Bajaj and Anirudh Singh"
+        self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun Bajaj"
         self.AboutInfo = Message(self.content_frame,bg="Black",fg="White",font=self.TextFont,justify=CENTER,width=600,
                                  text=self.about)
         self.AboutInfo.place(x=0,y=0)
@@ -478,14 +479,16 @@ class AttendanceManager(object):
         self.BackButton.place(x=400,y=250)
 
     def create_MainFrame(self,page="Any"):
+        #Function to create the main frame of every page
         self.main_frame = Frame(self.root, height=800, width=1200)
         self.main_frame.place(x=0, y=0)
         self.BackgroundImage(self.main_frame,page)
 
     def BackgroundImage(self,frame,page="Any"):
-        if page == "First":
+        #Function for setting the background image of the app
+        if page == "First": #set bg image with heading if the page is the first page
             self.bg_image = ImageTk.PhotoImage(file="Images/Background_Front.jpg")
-        else:
+        else: #set bg image without heading if the page is other than first page
             self.bg_image = ImageTk.PhotoImage(file="Images/Background.jpg")
         self.bg_label = Label(frame, image=self.bg_image)
         self.bg_label.place(x=0, y=0)
