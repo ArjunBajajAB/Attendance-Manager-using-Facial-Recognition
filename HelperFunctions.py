@@ -263,7 +263,7 @@ def verify(image_path, identity, model):
 def ValidateInfo(name,roll,course,semester,ret=False):
     if roll.startswith("0"):
         roll = roll[1:]
-    mydb = mysql.connector.connect(host="localhost",user="arjun",password="wedding9711",database="AttendanceManager")
+    mydb = mysql.connector.connect(host="localhost",user="Arjun",password="Arjun12@",database="AttendanceManager")
     mycur = mydb.cursor()
     sql = "select Name,ID,SubjectID,ImageEncoding from Students where Name='{}' and EnrollmentNumber={} and Course='{}' and Semester={}".format(name,roll,course,semester)
     mycur.execute(sql)
@@ -287,7 +287,7 @@ def ValidateInfo(name,roll,course,semester,ret=False):
 
 def MarkInDatabase(subject,ID):
     CurrentDate = datetime.datetime.now().strftime("%Y-%m-%d")
-    mydb = mysql.connector.connect(host="localhost", user="arjun", password="wedding9711", database="AttendanceManager")
+    mydb = mysql.connector.connect(host="localhost", user="Arjun", password="Arjun12@", database="AttendanceManager")
     mycur = mydb.cursor()
     sql = "select * from {} where Date=(%s)".format(subject)
     val = (CurrentDate,)
@@ -332,7 +332,7 @@ def SubjectIdDict():
     return SubjectsID
 
 def DatabaseAttendance(month,year,subject,Id,attendance="overall"):
-    mydb = mysql.connector.connect(host="localhost", user="arjun", password="wedding9711", database="AttendanceManager")
+    mydb = mysql.connector.connect(host="localhost", user="Arjun", password="Arjun12@", database="AttendanceManager")
     mycur = mydb.cursor()
     if attendance == "overall":
         sql1 = "Select Date from {} where PresentID like '%{}%'".format(subject,Id)

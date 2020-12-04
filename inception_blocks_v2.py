@@ -94,7 +94,6 @@ def inception_block_1c(X):
 
     X_pool = MaxPooling2D(pool_size=3, strides=2, data_format='channels_first')(X)
     X_pool = ZeroPadding2D(padding=((0, 1), (0, 1)), data_format='channels_first')(X_pool)
-
     inception = concatenate([X_3x3, X_5x5, X_pool], axis=1)
 
     return inception

@@ -150,6 +150,7 @@ CREATE TABLE `CG` (
 
 LOCK TABLES `CG` WRITE;
 /*!40000 ALTER TABLE `CG` DISABLE KEYS */;
+INSERT INTO `CG` VALUES ('2020-11-26','1');
 /*!40000 ALTER TABLE `CG` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -311,6 +312,7 @@ CREATE TABLE `Ecom` (
 
 LOCK TABLES `Ecom` WRITE;
 /*!40000 ALTER TABLE `Ecom` DISABLE KEYS */;
+INSERT INTO `Ecom` VALUES ('2020-11-23','1'),('2020-11-24','1'),('2020-11-26','1');
 /*!40000 ALTER TABLE `Ecom` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -610,6 +612,7 @@ CREATE TABLE `OS` (
 
 LOCK TABLES `OS` WRITE;
 /*!40000 ALTER TABLE `OS` DISABLE KEYS */;
+INSERT INTO `OS` VALUES ('2020-11-23','1'),('2020-11-24','1'),('2020-11-26','1');
 /*!40000 ALTER TABLE `OS` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -633,6 +636,7 @@ CREATE TABLE `PHP` (
 
 LOCK TABLES `PHP` WRITE;
 /*!40000 ALTER TABLE `PHP` DISABLE KEYS */;
+INSERT INTO `PHP` VALUES ('2020-11-23','1'),('2020-11-24','1'),('2020-11-26','1');
 /*!40000 ALTER TABLE `PHP` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -766,6 +770,7 @@ CREATE TABLE `Students` (
   `Section` varchar(255) DEFAULT NULL,
   `SubjectID` varchar(255) DEFAULT NULL,
   `ImageEncoding` blob NOT NULL,
+  `Semester` int NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `EnrollmentNumber` (`EnrollmentNumber`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -777,7 +782,7 @@ CREATE TABLE `Students` (
 
 LOCK TABLES `Students` WRITE;
 /*!40000 ALTER TABLE `Students` DISABLE KEYS */;
-INSERT INTO `Students` VALUES (1,1514902018,'Arjun Bajaj','BCA','A','53',_binary '\Àsr=Në>aæ\Òª∑\Ì7<:√ß=\"Q%>\‚kã<r‚∑Ω?0—ºñ\÷kª/\ÿ<\÷\0=SÆ†=\ƒ\‚6º\”(>ºAºÉ<áºbƒΩ\Ù∆´ΩGy>ª)Ω∞Hº]â1=\Z&\’=\»\‡\Õ<êd±Ω`9\ΩZ-öΩi#¢<C—è=Cêx=\‰Æ>ãw-ºæ3˘=|Ωª>ï\Ì°=rh=M±#<F+Gº¯¢H=\ƒ=˘Ω∏Øº$$æÜ*òΩ¨\…=2É\»=\Z@§=\‹Tæmπ=\‡\œcΩKΩºù5=sA“ª0\Óó=\ﬂ˝\≈<Eûæó€≥=¢%€Ω\“S\‘:ò3!æ\€ø=\÷π=Aâæü˘V=¸&>\\˛\0=\„⁄†=ãP]æ¨øÀºBˇ0º[“î=\»WÂΩäèy=NÜ>+fÅ=\"å=õÇbΩR∂¶=[©=î¶x<Æ\r\Ô:æ\r©Ω\˜)/Ω\Õ\ˆ∂ªX+R=˙\Ô0Ω_µºtb\‰ªf{\">\‰\„>1\„æ:\÷!=∞L >~/•Ω3\Ï\ÁªR$Ω\‚LΩQ&´=\»<Ω\„C\Ë<qÄ°Ω\"æM˙=µ\ÌæU\–6>G∑ñΩä\ÍM<_F•ª/®Å<\Â∏\È<î\'>\Ïó:\√-\«99N<	\€\\ªTæøE\È<\Ã›Ω;=A>Ê•ì=∏ººqç4=ûÖ>±ëB:™\Ÿ=vó=\ngæ'),(4,1114902018,'Anirudh','BCA','A','53',_binary 'NoneN');
+INSERT INTO `Students` VALUES (1,1514902018,'Arjun Bajaj','BCA','A','53',_binary '\Àsr=Në>aæ\Òª∑\Ì7<:√ß=\"Q%>\‚kã<r‚∑Ω?0—ºñ\÷kª/\ÿ<\÷\0=SÆ†=\ƒ\‚6º\”(>ºAºÉ<áºbƒΩ\Ù∆´ΩGy>ª)Ω∞Hº]â1=\Z&\’=\»\‡\Õ<êd±Ω`9\ΩZ-öΩi#¢<C—è=Cêx=\‰Æ>ãw-ºæ3˘=|Ωª>ï\Ì°=rh=M±#<F+Gº¯¢H=\ƒ=˘Ω∏Øº$$æÜ*òΩ¨\…=2É\»=\Z@§=\‹Tæmπ=\‡\œcΩKΩºù5=sA“ª0\Óó=\ﬂ˝\≈<Eûæó€≥=¢%€Ω\“S\‘:ò3!æ\€ø=\÷π=Aâæü˘V=¸&>\\˛\0=\„⁄†=ãP]æ¨øÀºBˇ0º[“î=\»WÂΩäèy=NÜ>+fÅ=\"å=õÇbΩR∂¶=[©=î¶x<Æ\r\Ô:æ\r©Ω\˜)/Ω\Õ\ˆ∂ªX+R=˙\Ô0Ω_µºtb\‰ªf{\">\‰\„>1\„æ:\÷!=∞L >~/•Ω3\Ï\ÁªR$Ω\‚LΩQ&´=\»<Ω\„C\Ë<qÄ°Ω\"æM˙=µ\ÌæU\–6>G∑ñΩä\ÍM<_F•ª/®Å<\Â∏\È<î\'>\Ïó:\√-\«99N<	\€\\ªTæøE\È<\Ã›Ω;=A>Ê•ì=∏ººqç4=ûÖ>±ëB:™\Ÿ=vó=\ngæ',5),(4,1114902018,'Anirudh','BCA','A','53',_binary 'NoneN',5);
 /*!40000 ALTER TABLE `Students` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -840,4 +845,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-11-21 20:20:58
+-- Dump completed on 2020-11-30 11:53:32

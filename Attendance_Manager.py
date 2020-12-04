@@ -20,8 +20,9 @@ class AttendanceManager(object):
 
         # Tkinter fonts intialized into variables for further use
         self.ButtonFont = tkFont.Font(family="Playbill", size=20, weight="bold")
-        self.TextFont = tkFont.Font(family="Courier New", size=15, weight="bold")
+        self.TextFont = tkFont.Font(family="Courier New", size=18, weight="bold")
         self.InfoFont = tkFont.Font(family="Courier New", size=25, weight="bold")
+        self.EntryFont = tkFont.Font(family="Courier New",size=15)
 
         #Calling the first page function
         self.FirstPage()
@@ -33,6 +34,9 @@ class AttendanceManager(object):
 
     def FirstPage(self):
         self.create_MainFrame("First") #Calling the create_MainFrame function with "First" argument so as to specify background image
+        self.SideImage = ImageTk.PhotoImage(file = "Images/Attendance.jpg")
+        self.Image = Label(self.main_frame,image=self.SideImage)
+        self.Image.place(x=10,y=200)
         self.content_frame = Frame(self.main_frame,height=300,width=700,bg="Black")
         self.content_frame.place(x=500,y=550)  #Place below heading
         self.ProceedButton = Button(self.content_frame,text="Proceed",activebackground="grey",bd=3,bg="White",fg="Black",
@@ -52,20 +56,23 @@ class AttendanceManager(object):
     def ProceedPage(self):
         self.main_frame.destroy()  #Destroy the entire main frame and create a new page
         self.create_MainFrame()  #without "First" argument so as to change the background Image
-        self.NameLabel = Label(self.main_frame, text="Name     :",bg="black", fg="white", font=self.TextFont)
+        self.SideImage = ImageTk.PhotoImage(file="Images/details.jpg")
+        self.SideLabel = Label(self.main_frame,image=self.SideImage)
+        self.SideLabel.place(x=10,y=50)
+        self.NameLabel = Label(self.main_frame,text="Name     :",bg="black", fg="white", font=self.TextFont)
         self.NameLabel.place(x=600, y=170)
 
-        self.EnterName = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black")  #Entry widget for name
-        self.EnterName.place(x=790, y=170)
+        self.EnterName = Entry(self.main_frame,font=self.EntryFont, bd=3,width=25, bg="white", fg="black")  #Entry widget for name
+        self.EnterName.place(x=790, y=170,height=40)
 
         self.EnrollmentNoLabel = Label(self.main_frame, text="Enrollment No :", bg="black", fg="white",
                                        font=self.TextFont)
         self.EnrollmentNoLabel.place(x=600, y=240)
 
-        self.EnterEnrollmentNo = Entry(self.main_frame, bd=3,width=30, bg="white", fg="black") #Entry widget for enrollment
-        self.EnterEnrollmentNo.place(x=790, y=240)
+        self.EnterEnrollmentNo = Entry(self.main_frame,font=self.EntryFont, bd=3,width=20, bg="white", fg="black") #Entry widget for enrollment
+        self.EnterEnrollmentNo.place(x=860, y=240,height=40)
 
-        self.CourseLabel = Label(self.main_frame, text="Course     :", bg="black", fg="white", font=self.TextFont)
+        self.CourseLabel = Label(self.main_frame, text="Course  :", bg="black", fg="white", font=self.TextFont)
         self.CourseLabel.place(x=600, y=300)
 
         self.clicked = StringVar(self.main_frame)
@@ -74,7 +81,7 @@ class AttendanceManager(object):
         self.CourseEnter.config(bg="Black", fg="White",activebackground="grey",font=self.TextFont)
         self.CourseEnter.place(x=790, y=300)
 
-        self.SemesterLabel = Label(self.main_frame, text="Semester   :", bg="black", fg="white", font=self.TextFont)
+        self.SemesterLabel = Label(self.main_frame, text="Semester :", bg="black", fg="white", font=self.TextFont)
         self.SemesterLabel.place(x=600, y=360)
 
         self.SelectSemester = StringVar(self.main_frame)
@@ -140,23 +147,30 @@ class AttendanceManager(object):
     def CheckMarkButton(self):
         self.main_frame.destroy() #Destroy previous page
         self.create_MainFrame()
+        self.SideImage = ImageTk.PhotoImage(file="Images/options.jpg")
+        self.SideLabel = Label(self.main_frame,image=self.SideImage)
+        self.SideLabel.place(x=10,y=20)
         self.Check_Your_AttendanceButton = Button(self.main_frame, text="Check your attendance",
                                                   activebackground="grey", bd=3, bg="White",
                                                   fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                                  width=25, command=self.Check_AttendancePage)
-        self.Check_Your_AttendanceButton.place(x=650, y=210)
+                                                  width=20, command=self.Check_AttendancePage)
+        self.Check_Your_AttendanceButton.place(x=750, y=210)
 
         self.Mark_Your_AttendanceButton = Button(self.main_frame, text="Mark your attendance",
                                                  activebackground="grey", bd=3, bg="White",
                                                  fg="Black", font=self.ButtonFont, justify=RIGHT, height=1,
-                                                 width=25, command=self.MarkAttendancePage)
-        self.Mark_Your_AttendanceButton.place(x=650, y=310)
+                                                 width=20, command=self.MarkAttendancePage)
+        self.Mark_Your_AttendanceButton.place(x=750, y=310)
 
         self.BackButton_Check = Button(self.main_frame, text="Back", activebackground="grey", bd=3,
                                        bg="White",
                                        fg="Black", font=self.ButtonFont, justify=RIGHT, height=1, width=8,
                                        command=self.ProceedPage)
-        self.BackButton_Check.place(x=650, y=410)
+        self.BackButton_Check.place(x=750, y=410)
+        self.ExitButton = Button(self.main_frame, text="Exit", activebackground="grey", bd=3, bg="White",
+                                 fg="Black",
+                                 command=exit, font=self.ButtonFont, justify=RIGHT, height=1, width=8)
+        self.ExitButton.place(x=750, y=510)
 
     ##############################################################################################################
     ########################################## Mark Attendance Page ##############################################
@@ -366,13 +380,13 @@ class AttendanceManager(object):
         self.main_frame.destroy()
         self.create_MainFrame()
 
-        self.content_frame = Frame(self.root, height=220, width=650, bg="Black")
-        self.content_frame.place(x=500, y=80)
+        self.content_frame = Frame(self.root, height=220, width=450, bg="Black")
+        self.content_frame.place(x=600, y=80)
         self.ButtonFrame = Frame(self.main_frame, bg="black", height=450, width=500)
-        self.ButtonFrame.place(x=620, y=300)
+        self.ButtonFrame.place(x=680, y=300)
 
-        self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", fg="white",font=self.TextFont)
-        self.SelectSubject.place(x=120, y=70)
+        self.SelectSubject = Label(self.content_frame, text="Select subject :", bg="black", justify=RIGHT,fg="white",font=self.TextFont)
+        self.SelectSubject.place(x=110, y=70)
         self.InfoFrame = Frame(self.content_frame,height=90,width=430,bg="black")
         self.InfoFrame.place(x=120,y=130)
 
@@ -392,6 +406,9 @@ class AttendanceManager(object):
         self.SubjectEnter.config(bg="Black", fg="White")
         self.SubjectEnter.place(x=340, y=70)
 
+        self.SideImage = ImageTk.PhotoImage(file="Images/DisplayAttendance.jpg")
+        self.SideLabel = Label(self.main_frame,image=self.SideImage)
+        self.SideLabel.place(x=20,y=230)
         self.OverallAttendance = Button(self.ButtonFrame, text="Overall attendance", activebackground="grey", bd=3,
                                         bg="White", fg="Black", font=self.ButtonFont, justify=CENTER, height=1, width=21,
                                         command=self.TotalAttendance)
@@ -421,7 +438,7 @@ class AttendanceManager(object):
             self.Info.place(x=0, y=0)
         else: #If a subject is selected
             self.Date = datetime.datetime.now() #Get current date
-            self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
+            self.AttendanceFrame = Frame(self.main_frame, height=225, width=380, bg="white")
             self.AttendanceFrame.place(x=100, y=300)
             self.InfoFrame.destroy()
             #Get the overall attendance from the database by calling this function from HelperFunctions
@@ -432,7 +449,7 @@ class AttendanceManager(object):
                 text = "Your overall attendance for the subject {} is {}/{} which is {}%".format(self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
             else: #If return value is False, i.e. not attendance record
                 text = "No attendance found for this subject!"
-            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
+            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="black",bg="white",width=350,justify=CENTER,
                                              text=text)
             self.AttendanceDisplay.place(x=0,y=0)
 
@@ -446,18 +463,20 @@ class AttendanceManager(object):
 
         else:
             self.Date = datetime.datetime.now() #get current date
-            self.AttendanceFrame = Frame(self.main_frame, height=225, width=500, bg="black")
+            self.AttendanceFrame = Frame(self.main_frame, height=225, width=380, bg="white")
             self.AttendanceFrame.place(x=100, y=300)
             self.InfoFrame.destroy()
             if month == "Current": #to display this month's attendance
-                self.MonthPresent,self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date.month,self.Date.year,self.subject,self.ID,"Current")
+                self.Date_month = self.Date.month
+                self.MonthPresent,self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date_month,self.Date.year,self.subject,self.ID,"Current")
             else: #to display previous month's attendance
-                self.MonthPresent,self.MonthTotal,self.AttendancePercent = DatabaseAttendance(self.Date.month-1,self.Date.year,self.subject, self.ID,"Last")
+                self.Date_month = self.Date.month-1
+                self.MonthPresent,self.MonthTotal,self.AttendancePercent = DatabaseAttendance(self.Date_month,self.Date.year,self.subject, self.ID,"Last")
             if self.MonthTotal: #If return value is not False and record exists
-                text = "Your attendance for the month {} and subject {} is {}/{} which is {}%".format(self.Date.month,self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
+                text = "Your attendance for the month {} and subject {} is {}/{} which is {}%".format(self.Date_month,self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
             else: #If no record exists and return value is false
                 text = "No attendance found for this month in this subject."
-            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="white",bg="black",width=350,justify=CENTER,
+            self.AttendanceDisplay = Message(self.AttendanceFrame,font=self.InfoFont,fg="black",bg="white",width=350,justify=CENTER,
                                              text=text)
             self.AttendanceDisplay.place(x=0,y=0)
 
@@ -468,15 +487,15 @@ class AttendanceManager(object):
     def AboutPage(self):
         #About the developer of the Project
         self.content_frame.destroy() #Just destroy the content frame as the heading is needed
-        self.content_frame = Frame(self.main_frame, height=300, width=700, bg="Black")
-        self.content_frame.place(x=500, y=450)  # Place below heading
+        self.content_frame = Frame(self.main_frame, height=350, width=700, bg="Black")
+        self.content_frame.place(x=500, y=400)  # Place below heading
         self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun Bajaj"
         self.AboutInfo = Message(self.content_frame,bg="Black",fg="White",font=self.TextFont,justify=CENTER,width=600,
                                  text=self.about)
         self.AboutInfo.place(x=0,y=0)
         self.BackButton = Button(self.content_frame, text="Back", activebackground="grey", bd=3, bg="White",fg="Black",
                                     command=self.FirstPage, font=self.ButtonFont, justify=CENTER, height=1, width=5)
-        self.BackButton.place(x=400,y=250)
+        self.BackButton.place(x=400,y=300)
 
     def create_MainFrame(self,page="Any"):
         #Function to create the main frame of every page
