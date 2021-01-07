@@ -470,7 +470,7 @@ class AttendanceManager(object):
                 self.Date_month = self.Date.month
                 self.MonthPresent,self.MonthTotal, self.AttendancePercent = DatabaseAttendance(self.Date_month,self.Date.year,self.subject,self.ID,"Current")
             else: #to display previous month's attendance
-                self.Date_month = self.Date.month-1
+                self.Date_month = self.Date.month-1 if self.Date.month>1 else 12 
                 self.MonthPresent,self.MonthTotal,self.AttendancePercent = DatabaseAttendance(self.Date_month,self.Date.year,self.subject, self.ID,"Last")
             if self.MonthTotal: #If return value is not False and record exists
                 text = "Your attendance for the month {} and subject {} is {}/{} which is {}%".format(self.Date_month,self.subject,self.MonthPresent,self.MonthTotal,self.AttendancePercent)
@@ -489,7 +489,7 @@ class AttendanceManager(object):
         self.content_frame.destroy() #Just destroy the content frame as the heading is needed
         self.content_frame = Frame(self.main_frame, height=350, width=700, bg="Black")
         self.content_frame.place(x=500, y=400)  # Place below heading
-        self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun Bajaj"
+        self.about = "Attendance Manager \n\n This is an application that can mark as well as manage your attendance. It confirms your identity by opening your webcam and using our face recognition model to confirm your identity and automatically mark your attendance.Also you can check your previous attendance. \n This application is developed by Arjun and Anirudh."
         self.AboutInfo = Message(self.content_frame,bg="Black",fg="White",font=self.TextFont,justify=CENTER,width=600,
                                  text=self.about)
         self.AboutInfo.place(x=0,y=0)
