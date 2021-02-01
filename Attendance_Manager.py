@@ -7,6 +7,8 @@ from HelperFunctions import *
 from inception_blocks_v2 import *
 from keras import backend as K
 K.set_image_data_format('channels_first')
+import _thread as thread
+
 #Add more libraries here
 
 class AttendanceManager(object):
@@ -194,8 +196,25 @@ class AttendanceManager(object):
                             font=self.TextFont,fg="white",width=750,justify=LEFT,bg="black")
         self.Info.place(x=0,y=0)
         self.ClickButton = Button(self.ContentFrame,text="Click",fg="black",bg="white",bd=3,activebackground="grey",font=self.ButtonFont,
-                                  height=1,width=8,command=self.ClickImage,justify=CENTER)
+                                  height=1,width=8,command=self.ExecuteThread,justify=CENTER)
         self.ClickButton.place(x=850,y=0)
+
+    
+    def ExecuteThread(self):
+        thread.start_new_thread(self.ClickImage,())
+        thread.start_new_thread(self.WaitingFrame,())
+        
+    def WaitingFrame(self):
+        self.SaveImage() #to save the image
+        self.main_frame.destroy()
+        self.create_MainFrame()
+        self.HeadingFrame = Frame(self.main_frame, height=100, width=650, bg="black")
+        self.HeadingFrame.place(x=500, y=50)
+        self.Heading = Message(self.HeadingFrame, font=self.InfoFont, fg="white", bg="black", width=500,
+                                   justify=CENTER,
+                                   text="Wait " + self.UniName)
+
+        self.Heading.place(x=0, y=0)
 
     def ShowFrame(self):
         # Function to continuosly read from webcam videeo stream and display it
@@ -210,7 +229,7 @@ class AttendanceManager(object):
             self.CameraLabel.after(10, self.ShowFrame) #loop after 10ms so that video stream is continously displayed
 
     def ClickImage(self):
-        self.SaveImage() #to save the image
+        #self.SaveImage() #to save the image
         self.Info.destroy()
         ID,self.SubjectId,ImageEncoding = ValidateInfo(self.UniName,self.RollNo,self.Course,self.Semester,True)
         self.ModelLoad(ImageEncoding)

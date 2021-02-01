@@ -246,13 +246,13 @@ def verify(image_path, identity, model):
     Mark_attendance -- True, if the attendance should be marked . False otherwise.
     """
 
-    # Step 1: Compute the encoding for the image. Use img_to_encoding() see example above. (≈ 1 line)
+    # Step 1: Compute the encoding for the image. 
     encoding = img_to_encoding(image_path, model)
     ImageEncoding = np.frombuffer(identity,dtype=np.float32)
-    # Step 2: Compute distance with identity's image (≈ 1 line)
+    # Step 2: Compute distance with identity's image
     dist = np.linalg.norm(encoding - ImageEncoding)
 
-    # Step 3: Open the door if dist < 0.7, else don't open (≈ 3 lines)
+    # Step 3: Mark the attendance if dist < 0.7, else don't mark
     if dist < 0.7:
         Mark_attendance = True
     else:
